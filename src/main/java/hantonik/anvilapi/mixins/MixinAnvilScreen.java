@@ -33,19 +33,20 @@ public abstract class MixinAnvilScreen extends ItemCombinerScreen<AnvilMenu> {
 
     @Inject(at = @At("HEAD"), method = "slotChanged", cancellable = true)
     public void slotChanged(AbstractContainerMenu menu, int slot, ItemStack stack, CallbackInfo callback) {
-        if (this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), this.player.level).orElse(null) != null) {
-            this.name.setValue(menu.getSlot(2).hasItem() ? menu.getSlot(2).getItem().getHoverName().getString() : "");
-            this.name.setEditable(menu.getSlot(2).hasItem());
+        if (slot != 2) {
+            this.name.setValue(menu.getSlot(0).hasItem() ? menu.getSlot(0).getItem().getHoverName().getString() : "");
+            this.name.setEditable(menu.getSlot(0).hasItem());
+
             this.setFocused(this.name);
-        } else {
-            if (slot == 1) {
-                this.name.setValue(menu.getSlot(0).hasItem() ? menu.getSlot(0).getItem().getHoverName().getString() : "");
-                this.name.setEditable(menu.getSlot(0).hasItem());
+        }
 
-                this.setFocused(this.name);
-            }
+        var recipe = this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), this.player.level).orElse(null);
 
-            return;
+        if (recipe != null) {
+            this.name.setValue(menu.getSlot(2).hasItem() ? recipe.getOutputName().getString() : "");
+            this.name.setEditable(menu.getSlot(2).hasItem());
+
+            this.setFocused(this.name);
         }
 
         callback.cancel();

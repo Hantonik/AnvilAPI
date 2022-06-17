@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AnvilMenu.class)
 public abstract class MixinAnvilMenu extends ItemCombinerMenu {
@@ -30,6 +31,13 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     public MixinAnvilMenu(@Nullable MenuType<?> p_39773_, int p_39774_, Inventory p_39775_, ContainerLevelAccess p_39776_) {
         super(p_39773_, p_39774_, p_39775_, p_39776_);
+    }
+
+    @Inject(at = @At("HEAD"), method = "mayPickup", cancellable = true)
+    protected void mayPickup(Player player, boolean b, CallbackInfoReturnable<Boolean> callback) {
+        callback.setReturnValue(player.getAbilities().instabuild || player.experienceLevel >= this.cost.get());
+
+        callback.cancel();
     }
 
     @Inject(at = @At("HEAD"), method = "onTake", cancellable = true)
