@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "hantonik.anvilapi.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "anvilapi.refmap.json",
+  "mixins": [
+    "MixinAnvilMenu",
+    "MixinAnvilScreen"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}
