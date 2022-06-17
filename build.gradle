@@ -102,7 +102,7 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-${config.mc_version}-forge:${config.jei_version}")
     runtimeOnly fg.deobf("mezz.jei:jei-${config.mc_version}-core:${config.jei_version}")
 
-    implementation fg.deobf("hantonik.atomiccore:AtomicCore-${config.mc_version}:${config.core_version}:dev")
+    implementation fg.deobf("hantonik.atomiccore:AtomicCore-${config.mc_version}:${config.core_version}")
 
     implementation 'org.projectlombok:lombok:1.18.24'
 }
