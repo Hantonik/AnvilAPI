@@ -32,6 +32,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     @Shadow
     public int repairItemCountCost;
 
+    @Shadow public abstract void createResult();
+
     public MixinAnvilMenu(@Nullable MenuType<?> type, int containerId, Inventory container, ContainerLevelAccess access) {
         super(type, containerId, container, access);
     }
@@ -48,15 +50,17 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
         if (!player.getAbilities().instabuild)
             player.giveExperienceLevels(-this.cost.get());
 
+        this.cost.set(0);
+
         float breakChance = ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
 
         var recipe = this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
 
         if (recipe != null) {
-            if (recipe.consumeInput1()) {
-                ItemStack input1 = this.inputSlots.getItem(0);
-                ItemStack input1Return = recipe.getInput1Return().copy();
+            ItemStack input1 = this.inputSlots.getItem(0);
+            ItemStack input1Return = recipe.getInput1Return().copy();
 
+            if (recipe.consumeInput1()) {
                 if (recipe.getInput1().test(input1)) {
                     input1.shrink(recipe.getInput1Amount());
                     this.inputSlots.setItem(0, input1);
@@ -86,12 +90,32 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                             this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
                     }
                 }
+            } else {
+                if (recipe.getInput1().test(input1)) {
+                    if (!input1Return.isEmpty()) {
+                        if (StackHelper.canCombineStacks(input1Return, this.inputSlots.getItem(0)))
+                            this.inputSlots.setItem(0, StackHelper.combineStacks(input1Return, this.inputSlots.getItem(0)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
+                    }
+                } else {
+                    if (!input1Return.isEmpty()) {
+                        if (StackHelper.canCombineStacks(input1Return, this.inputSlots.getItem(1)))
+                            this.inputSlots.setItem(1, StackHelper.combineStacks(input1Return, this.inputSlots.getItem(1)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
+                    }
+                }
+
+                this.createResult();
             }
 
-            if (recipe.consumeInput2()) {
-                ItemStack input2 = this.inputSlots.getItem(1);
-                ItemStack input2Return = recipe.getInput2Return().copy();
+            ItemStack input2 = this.inputSlots.getItem(1);
+            ItemStack input2Return = recipe.getInput2Return().copy();
 
+            if (recipe.consumeInput2()) {
                 if (recipe.getInput2().test(input2)) {
                     input2.shrink(recipe.getInput2Amount());
                     this.inputSlots.setItem(1, input2);
@@ -121,6 +145,26 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                             this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
                     }
                 }
+            } else {
+                if (recipe.getInput2().test(input2)) {
+                    if (!input2Return.isEmpty()) {
+                        if (StackHelper.canCombineStacks(input2Return, this.inputSlots.getItem(1)))
+                            this.inputSlots.setItem(1, StackHelper.combineStacks(input2Return, this.inputSlots.getItem(1)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
+                    }
+                } else {
+                    if (!input2Return.isEmpty()) {
+                        if (StackHelper.canCombineStacks(input2Return, this.inputSlots.getItem(0)))
+                            this.inputSlots.setItem(0, StackHelper.combineStacks(input2Return, this.inputSlots.getItem(0)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
+                    }
+                }
+
+                this.createResult();
             }
 
             this.broadcastChanges();
@@ -139,8 +183,6 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             } else
                 this.inputSlots.setItem(1, ItemStack.EMPTY);
         }
-
-        this.cost.set(0);
         
         this.access.execute((level, pos) -> {
             BlockState blockstate = level.getBlockState(pos);

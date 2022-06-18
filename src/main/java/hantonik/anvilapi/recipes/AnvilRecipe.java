@@ -173,12 +173,12 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             Ingredient input1 = Ingredient.fromJson(GsonHelper.isArrayNode(input1Json, "items") ? GsonHelper.getAsJsonArray(input1Json, "items") : GsonHelper.getAsJsonObject(input1Json, "items"));
             int input1Amount = input1Json.has("amount") ? GsonHelper.getAsInt(input1Json, "amount") : 1;
             boolean consumeInput1 = !input1Json.has("consume") || GsonHelper.getAsBoolean(input1Json, "consume");
-            ItemStack input1Return = consumeInput1 ? input1Json.has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(input1Json, "return")) : ItemStack.EMPTY : ItemStack.EMPTY;
+            ItemStack input1Return = input1Json.has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(input1Json, "return")) : ItemStack.EMPTY;
 
             Ingredient input2 = Ingredient.fromJson(GsonHelper.isArrayNode(input2Json, "items") ? GsonHelper.getAsJsonArray(input2Json, "items") : GsonHelper.getAsJsonObject(input2Json, "items"));
             int input2Amount = input2Json.has("amount") ? GsonHelper.getAsInt(input2Json, "amount") : 1;
             boolean consumeInput2 = !input2Json.has("consume") || GsonHelper.getAsBoolean(input2Json, "consume");
-            ItemStack input2Return = consumeInput2 ? input2Json.has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(input2Json, "return")) : ItemStack.EMPTY : ItemStack.EMPTY;
+            ItemStack input2Return = input2Json.has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(input2Json, "return")) : ItemStack.EMPTY;
 
             int experience = GsonHelper.getAsInt(json, "experience");
 
@@ -256,7 +256,7 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             if (!consumeInput1)
                 input1Group.addProperty("consume", consumeInput1);
 
-            if (consumeInput1 && !input1Return.isEmpty())
+            if (!input1Return.isEmpty())
                 input1Group.add("return", ItemHelper.serialize(input1Return));
 
             input2Group.add("items", input2Json);
@@ -267,7 +267,7 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             if (!consumeInput2)
                 input2Group.addProperty("consume", consumeInput2);
 
-            if (consumeInput2 && !input2Return.isEmpty())
+            if (!input2Return.isEmpty())
                 input1Group.add("return", ItemHelper.serialize(input2Return));
 
             inputs.add("input1", input1Group);
