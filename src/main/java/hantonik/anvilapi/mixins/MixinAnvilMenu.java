@@ -32,7 +32,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     @Shadow
     public int repairItemCountCost;
 
-    @Shadow public abstract void createResult();
+    @Shadow
+    public abstract void createResult();
 
     public MixinAnvilMenu(@Nullable MenuType<?> type, int containerId, Inventory container, ContainerLevelAccess access) {
         super(type, containerId, container, access);
@@ -62,8 +63,28 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
             if (recipe.consumeInput1()) {
                 if (recipe.getInput1().test(input1)) {
-                    input1.shrink(recipe.getInput1Amount());
-                    this.inputSlots.setItem(0, input1);
+                    if (recipe.ignoreInput1Durability()) {
+                        input1.shrink(recipe.getInput1Amount());
+                        this.inputSlots.setItem(0, input1);
+                    } else {
+                        if (input1.isDamageableItem()) {
+                            int damage = input1.getDamageValue() + recipe.getInput1Amount();
+
+                            input1.setDamageValue(damage);
+
+                            if (damage < input1.getMaxDamage())
+                                this.inputSlots.setItem(0, input1);
+                            else {
+                                input1.shrink(1);
+                                this.inputSlots.setItem(0, input1);
+
+                                this.access.execute((level, pos) -> level.levelEvent(1029, pos, 0));
+                            }
+                        } else {
+                            input1.shrink(recipe.getInput1Amount());
+                            this.inputSlots.setItem(0, input1);
+                        }
+                    }
 
                     if (!input1Return.isEmpty()) {
                         if (this.inputSlots.getItem(0).isEmpty())
@@ -76,8 +97,28 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                             this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
                     }
                 } else {
-                    input1.shrink(recipe.getInput2Amount());
-                    this.inputSlots.setItem(1, input1);
+                    if (recipe.ignoreInput1Durability()) {
+                        input1.shrink(recipe.getInput1Amount());
+                        this.inputSlots.setItem(1, input1);
+                    } else {
+                        if (input1.isDamageableItem()) {
+                            int damage = input1.getDamageValue() + recipe.getInput1Amount();
+
+                            input1.setDamageValue(damage);
+
+                            if (damage < input1.getMaxDamage())
+                                this.inputSlots.setItem(1, input1);
+                            else {
+                                input1.shrink(1);
+                                this.inputSlots.setItem(1, input1);
+
+                                this.access.execute((level, pos) -> level.levelEvent(1029, pos, 0));
+                            }
+                        } else {
+                            input1.shrink(recipe.getInput1Amount());
+                            this.inputSlots.setItem(1, input1);
+                        }
+                    }
 
                     if (!input1Return.isEmpty()) {
                         if (this.inputSlots.getItem(1).isEmpty())
@@ -117,8 +158,28 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
             if (recipe.consumeInput2()) {
                 if (recipe.getInput2().test(input2)) {
-                    input2.shrink(recipe.getInput2Amount());
-                    this.inputSlots.setItem(1, input2);
+                    if (recipe.ignoreInput2Durability()) {
+                        input2.shrink(recipe.getInput2Amount());
+                        this.inputSlots.setItem(1, input2);
+                    } else {
+                        if (input2.isDamageableItem()) {
+                            int damage = input2.getDamageValue() + recipe.getInput2Amount();
+
+                            input2.setDamageValue(damage);
+
+                            if (damage < input2.getMaxDamage())
+                                this.inputSlots.setItem(1, input2);
+                            else {
+                                input2.shrink(1);
+                                this.inputSlots.setItem(1, input2);
+
+                                this.access.execute((level, pos) -> level.levelEvent(1029, pos, 0));
+                            }
+                        } else {
+                            input2.shrink(recipe.getInput2Amount());
+                            this.inputSlots.setItem(1, input2);
+                        }
+                    }
 
                     if (!input2Return.isEmpty()) {
                         if (this.inputSlots.getItem(1).isEmpty())
@@ -131,8 +192,28 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                             this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
                     }
                 } else {
-                    input2.shrink(recipe.getInput1Amount());
-                    this.inputSlots.setItem(0, input2);
+                    if (recipe.ignoreInput2Durability()) {
+                        input2.shrink(recipe.getInput2Amount());
+                        this.inputSlots.setItem(0, input2);
+                    } else {
+                        if (input2.isDamageableItem()) {
+                            int damage = input2.getDamageValue() + recipe.getInput2Amount();
+
+                            input2.setDamageValue(damage);
+
+                            if (damage < input2.getMaxDamage())
+                                this.inputSlots.setItem(0, input2);
+                            else {
+                                input2.shrink(1);
+                                this.inputSlots.setItem(0, input2);
+
+                                this.access.execute((level, pos) -> level.levelEvent(1029, pos, 0));
+                            }
+                        } else {
+                            input2.shrink(recipe.getInput2Amount());
+                            this.inputSlots.setItem(0, input2);
+                        }
+                    }
 
                     if (!input2Return.isEmpty()) {
                         if (this.inputSlots.getItem(0).isEmpty())

@@ -20,6 +20,9 @@ public interface IAnvilRecipe extends Recipe<Container>, ISpecialRecipe {
     ItemStack getInput1Return();
     ItemStack getInput2Return();
 
+    boolean ignoreInput1Durability();
+    boolean ignoreInput2Durability();
+
     Component getOutputName();
 
     boolean isShapeless();

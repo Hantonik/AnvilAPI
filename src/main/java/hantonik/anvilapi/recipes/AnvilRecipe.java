@@ -30,24 +30,42 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
     private final boolean consumeInput2;
     private final ItemStack input1Return;
     private final ItemStack input2Return;
+    private final boolean ignoreInput1Durability;
+    private final boolean ignoreInput2Durability;
     private final ItemStack output;
     private final Component outputName;
     private final boolean isShapeless;
     private final int experience;
 
     public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean consumeInput1, Ingredient input2, int input2Amount, boolean consumeInput2, int experience, boolean isShapeless) {
-        this(id, output, input1, input1Amount, consumeInput1, ItemStack.EMPTY, input2, input2Amount, consumeInput2, ItemStack.EMPTY, experience, isShapeless, output.getHoverName());
+        this(id, output, input1, input1Amount, true, consumeInput1, ItemStack.EMPTY, input2, input2Amount, true, consumeInput2, ItemStack.EMPTY, experience, isShapeless, output.getHoverName());
     }
 
     public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean consumeInput1, Ingredient input2, int input2Amount, boolean consumeInput2, int experience, boolean isShapeless, Component outputName) {
-        this(id, output, input1, input1Amount, consumeInput1, ItemStack.EMPTY, input2, input2Amount, consumeInput2, ItemStack.EMPTY, experience, isShapeless, outputName);
+        this(id, output, input1, input1Amount, true, consumeInput1, ItemStack.EMPTY, input2, input2Amount, true, consumeInput2, ItemStack.EMPTY, experience, isShapeless, outputName);
     }
 
     public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean consumeInput1, ItemStack input1Return, Ingredient input2, int input2Amount, boolean consumeInput2, ItemStack input2Return, int experience, boolean isShapeless) {
-        this(id, output, input1, input1Amount, consumeInput1, input1Return, input2, input2Amount, consumeInput2, input2Return, experience, isShapeless, output.getHoverName());
+        this(id, output, input1, input1Amount, true, consumeInput1, input1Return, input2, input2Amount, true, consumeInput2, input2Return, experience, isShapeless, output.getHoverName());
     }
 
     public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean consumeInput1, ItemStack input1Return, Ingredient input2, int input2Amount, boolean consumeInput2, ItemStack input2Return, int experience, boolean isShapeless, Component outputName) {
+        this(id, output, input1, input1Amount, true, consumeInput1, input1Return, input2, input2Amount, true, consumeInput2, input2Return, experience, isShapeless, outputName);
+    }
+    
+    public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean ignoreInput1Durability, boolean consumeInput1, Ingredient input2, int input2Amount, boolean ignoreInput2Durability, boolean consumeInput2, int experience, boolean isShapeless) {
+        this(id, output, input1, input1Amount, ignoreInput1Durability, consumeInput1, ItemStack.EMPTY, input2, input2Amount, ignoreInput2Durability, consumeInput2, ItemStack.EMPTY, experience, isShapeless, output.getHoverName());
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean ignoreInput1Durability, boolean consumeInput1, Ingredient input2, int input2Amount, boolean ignoreInput2Durability, boolean consumeInput2, int experience, boolean isShapeless, Component outputName) {
+        this(id, output, input1, input1Amount, ignoreInput1Durability, consumeInput1, ItemStack.EMPTY, input2, input2Amount, ignoreInput2Durability, consumeInput2, ItemStack.EMPTY, experience, isShapeless, outputName);
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean ignoreInput1Durability, boolean consumeInput1, ItemStack input1Return, Ingredient input2, int input2Amount, boolean ignoreInput2Durability, boolean consumeInput2, ItemStack input2Return, int experience, boolean isShapeless) {
+        this(id, output, input1, input1Amount, ignoreInput1Durability, consumeInput1, input1Return, input2, input2Amount, ignoreInput2Durability, consumeInput2, input2Return, experience, isShapeless, output.getHoverName());
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack output, Ingredient input1, int input1Amount, boolean ignoreInput1Durability, boolean consumeInput1, ItemStack input1Return, Ingredient input2, int input2Amount, boolean ignoreInput2Durability, boolean consumeInput2, ItemStack input2Return, int experience, boolean isShapeless, Component outputName) {
         super(new ResourceLocation("anvil"));
 
         this.id = id;
@@ -59,6 +77,8 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
         this.consumeInput2 = consumeInput2;
         this.input1Return = input1Return;
         this.input2Return = input2Return;
+        this.ignoreInput1Durability = ignoreInput1Durability;
+        this.ignoreInput2Durability = ignoreInput2Durability;
         this.output = output;
         this.isShapeless = isShapeless;
         this.outputName = outputName;
@@ -108,6 +128,16 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
     @Override
     public ItemStack getInput2Return() {
         return this.input2Return;
+    }
+
+    @Override
+    public boolean ignoreInput1Durability() {
+        return this.ignoreInput1Durability;
+    }
+
+    @Override
+    public boolean ignoreInput2Durability() {
+        return ignoreInput2Durability;
     }
 
     @Override
@@ -174,17 +204,19 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             int input1Amount = input1Json.has("amount") ? GsonHelper.getAsInt(input1Json, "amount") : 1;
             boolean consumeInput1 = !input1Json.has("consume") || GsonHelper.getAsBoolean(input1Json, "consume");
             ItemStack input1Return = input1Json.has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(input1Json, "return")) : ItemStack.EMPTY;
-
+            boolean ignoreInput1Durability = !input1Json.has("ignoreDurability") || GsonHelper.getAsBoolean(input1Json, "ignoreDurability");
+            
             Ingredient input2 = Ingredient.fromJson(GsonHelper.isArrayNode(input2Json, "items") ? GsonHelper.getAsJsonArray(input2Json, "items") : GsonHelper.getAsJsonObject(input2Json, "items"));
             int input2Amount = input2Json.has("amount") ? GsonHelper.getAsInt(input2Json, "amount") : 1;
             boolean consumeInput2 = !input2Json.has("consume") || GsonHelper.getAsBoolean(input2Json, "consume");
             ItemStack input2Return = input2Json.has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(input2Json, "return")) : ItemStack.EMPTY;
-
+            boolean ignoreInput2Durability = !input2Json.has("ignoreDurability") || GsonHelper.getAsBoolean(input2Json, "ignoreDurability");
+            
             int experience = GsonHelper.getAsInt(json, "experience");
 
             boolean isShapeless = json.has("shapeless") && GsonHelper.getAsBoolean(json, "shapeless");
 
-            return new AnvilRecipe(id, output, input1, input1Amount, consumeInput1, input1Return, input2, input2Amount, consumeInput2, input2Return, experience, isShapeless);
+            return new AnvilRecipe(id, output, input1, input1Amount, ignoreInput1Durability, consumeInput1, input1Return, input2, input2Amount, ignoreInput2Durability, consumeInput2, input2Return, experience, isShapeless);
         }
 
         @Override
@@ -204,11 +236,14 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             ItemStack input1Return = buffer.readItem();
             ItemStack input2Return = buffer.readItem();
 
+            boolean ignoreInput1Durability = buffer.readBoolean();
+            boolean ignoreInput2Durability = buffer.readBoolean();
+
             int experience = buffer.readInt();
 
             boolean isShapeless = buffer.readBoolean();
 
-            return new AnvilRecipe(id, output, input1, input1Amount, consumeInput1, input1Return, input2, input2Amount, consumeInput2, input2Return, experience, isShapeless);
+            return new AnvilRecipe(id, output, input1, input1Amount, ignoreInput1Durability, consumeInput1, input1Return, input2, input2Amount, ignoreInput2Durability, consumeInput2, input2Return, experience, isShapeless);
         }
 
         @Override
@@ -226,6 +261,9 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
 
             buffer.writeItem(recipe.input1Return);
             buffer.writeItem(recipe.input2Return);
+
+            buffer.writeBoolean(recipe.ignoreInput1Durability);
+            buffer.writeBoolean(recipe.ignoreInput2Durability);
 
             buffer.writeInt(recipe.experience);
 
@@ -259,6 +297,9 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             if (!input1Return.isEmpty())
                 input1Group.add("return", ItemHelper.serialize(input1Return));
 
+            if (!ignoreInput1Durability)
+                input1Group.addProperty("ignoreDurability", ignoreInput1Durability);
+            
             input2Group.add("items", input2Json);
 
             if (input2Amount != 1)
@@ -268,7 +309,10 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
                 input2Group.addProperty("consume", consumeInput2);
 
             if (!input2Return.isEmpty())
-                input1Group.add("return", ItemHelper.serialize(input2Return));
+                input2Group.add("return", ItemHelper.serialize(input2Return));
+
+            if (!ignoreInput2Durability)
+                input2Group.addProperty("ignoreDurability", ignoreInput2Durability);
 
             inputs.add("input1", input1Group);
             inputs.add("input2", input2Group);
