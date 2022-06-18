@@ -1,14 +1,17 @@
 package hantonik.anvilapi.mixins;
 
 import hantonik.anvilapi.init.Recipes;
+import hantonik.atomiccore.utils.helpers.StackHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.ForgeHooks;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -29,8 +32,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     @Shadow
     public int repairItemCountCost;
 
-    public MixinAnvilMenu(@Nullable MenuType<?> p_39773_, int p_39774_, Inventory p_39775_, ContainerLevelAccess p_39776_) {
-        super(p_39773_, p_39774_, p_39775_, p_39776_);
+    public MixinAnvilMenu(@Nullable MenuType<?> type, int containerId, Inventory container, ContainerLevelAccess access) {
+        super(type, containerId, container, access);
     }
 
     @Inject(at = @At("HEAD"), method = "mayPickup", cancellable = true)
@@ -45,30 +48,82 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
         if (!player.getAbilities().instabuild)
             player.giveExperienceLevels(-this.cost.get());
 
-        float breakChance = net.minecraftforge.common.ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
+        float breakChance = ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
 
         var recipe = this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
 
         if (recipe != null) {
-            ItemStack input1 = this.inputSlots.getItem(0);
+            if (recipe.consumeInput1()) {
+                ItemStack input1 = this.inputSlots.getItem(0);
+                ItemStack input1Return = recipe.getInput1Return().copy();
 
-            if (recipe.getInput1().test(input1)) {
-                input1.shrink(recipe.getInput1Amount());
-                this.inputSlots.setItem(0, input1);
-            } else {
-                input1.shrink(recipe.getInput2Amount());
-                this.inputSlots.setItem(1, input1);
+                if (recipe.getInput1().test(input1)) {
+                    input1.shrink(recipe.getInput1Amount());
+                    this.inputSlots.setItem(0, input1);
+
+                    if (!input1Return.isEmpty()) {
+                        if (this.inputSlots.getItem(0).isEmpty())
+                            this.inputSlots.setItem(0, input1Return);
+
+                        else if (StackHelper.canCombineStacks(input1Return, this.inputSlots.getItem(0)))
+                            this.inputSlots.setItem(0, StackHelper.combineStacks(input1Return, this.inputSlots.getItem(0)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
+                    }
+                } else {
+                    input1.shrink(recipe.getInput2Amount());
+                    this.inputSlots.setItem(1, input1);
+
+                    if (!input1Return.isEmpty()) {
+                        if (this.inputSlots.getItem(1).isEmpty())
+                            this.inputSlots.setItem(1, input1Return);
+
+                        else if (StackHelper.canCombineStacks(input1Return, this.inputSlots.getItem(1)))
+                            this.inputSlots.setItem(1, StackHelper.combineStacks(input1Return, this.inputSlots.getItem(1)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
+                    }
+                }
             }
 
-            ItemStack input2 = this.inputSlots.getItem(1);
+            if (recipe.consumeInput2()) {
+                ItemStack input2 = this.inputSlots.getItem(1);
+                ItemStack input2Return = recipe.getInput2Return().copy();
 
-            if (recipe.getInput2().test(input2)) {
-                input2.shrink(recipe.getInput2Amount());
-                this.inputSlots.setItem(1, input2);
-            } else {
-                input2.shrink(recipe.getInput1Amount());
-                this.inputSlots.setItem(0, input2);
+                if (recipe.getInput2().test(input2)) {
+                    input2.shrink(recipe.getInput2Amount());
+                    this.inputSlots.setItem(1, input2);
+
+                    if (!input2Return.isEmpty()) {
+                        if (this.inputSlots.getItem(1).isEmpty())
+                            this.inputSlots.setItem(1, input2Return);
+
+                        else if (StackHelper.canCombineStacks(input2Return, this.inputSlots.getItem(1)))
+                            this.inputSlots.setItem(1, StackHelper.combineStacks(input2Return, this.inputSlots.getItem(1)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
+                    }
+                } else {
+                    input2.shrink(recipe.getInput1Amount());
+                    this.inputSlots.setItem(0, input2);
+
+                    if (!input2Return.isEmpty()) {
+                        if (this.inputSlots.getItem(0).isEmpty())
+                            this.inputSlots.setItem(0, input2Return);
+
+                        else if (StackHelper.canCombineStacks(input2Return, this.inputSlots.getItem(0)))
+                            this.inputSlots.setItem(0, StackHelper.combineStacks(input2Return, this.inputSlots.getItem(0)));
+
+                        else
+                            this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
+                    }
+                }
             }
+
+            this.broadcastChanges();
         } else {
             this.inputSlots.setItem(0, ItemStack.EMPTY);
 
