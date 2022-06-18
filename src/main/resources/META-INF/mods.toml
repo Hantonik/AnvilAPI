@@ -11,7 +11,7 @@ issueTrackerURL="https://github.com/Hantonik/AnvilAPI/issues"
     logoFile="logo.png"
     updateJSONURL="https://raw.githubusercontent.com/Hantonik/AnvilAPI/1.19/update.json"
     authors="Hantonik"
-    description='''
+    description='''AnvilAPI adds to the game the ability to create custom anvil recipes by datapacks.
     '''
 
 [[dependencies.anvilapi]]
