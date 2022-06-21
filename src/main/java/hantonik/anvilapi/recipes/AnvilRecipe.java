@@ -209,7 +209,7 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             boolean ignoreInput1Durability = !input1Json.has("ignoreDurability") || GsonHelper.getAsBoolean(input1Json, "ignoreDurability");
 
             if (!ignoreInput1Durability && Arrays.stream(input1.getItems()).anyMatch(stack -> !stack.isDamageableItem()))
-                throw new IllegalStateException("Cannot consume durability of item that has no durability.");
+                throw new IllegalArgumentException("Cannot consume durability of item that has no durability.");
             
             Ingredient input2 = Ingredient.fromJson(GsonHelper.isArrayNode(input2Json, "items") ? GsonHelper.getAsJsonArray(input2Json, "items") : GsonHelper.getAsJsonObject(input2Json, "items"));
             int input2Amount = input2Json.has("amount") ? GsonHelper.getAsInt(input2Json, "amount") : 1;
@@ -218,7 +218,7 @@ public class AnvilRecipe extends RecipeBuilder<AnvilRecipe> implements IAnvilRec
             boolean ignoreInput2Durability = !input2Json.has("ignoreDurability") || GsonHelper.getAsBoolean(input2Json, "ignoreDurability");
 
             if (!ignoreInput2Durability && Arrays.stream(input2.getItems()).anyMatch(stack -> !stack.isDamageableItem()))
-                throw new IllegalStateException("Cannot consume durability of item that has no durability.");
+                throw new IllegalArgumentException("Cannot consume durability of item that has no durability.");
 
             int experience = GsonHelper.getAsInt(json, "experience");
 
