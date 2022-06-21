@@ -2,11 +2,12 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
 
   "promos": {
-    "1.19-latest": "5.2.0",
-    "1.19-recommended": "5.2.0"
+    "1.19-latest": "5.2.1",
+    "1.19-recommended": "5.2.1"
   },
 
   "1.19": {
+    "5.2.1": "Fixed consume durability of item that has no durability",
     "5.2.0": "Input items can be damaged instead of consumed",
     "5.1.1": "Input can return other items also if input is not consumed",
     "5.1.0": "Added some new features and description",
