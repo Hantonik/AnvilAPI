@@ -1,6 +1,6 @@
 package hantonik.anvilapi.api.recipes;
 
-import hantonik.atomiccore.crafting.ISpecialRecipe;
+import hantonik.atomiccore.api.recipe.ISpecialRecipe;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
