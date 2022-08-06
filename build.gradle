@@ -1,0 +1,169 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'maven-publish'
+apply plugin: 'idea'
+apply plugin: 'org.spongepowered.mixin'
+
+file('gradle.properties').withReader {
+    def prop = new Properties()
+    prop.load(it)
+    project.ext.config = new ConfigSlurper().parse prop
+}
+
+version = "${config.mod_version}"
+group = "hantonik.${config.mod_id}"
+archivesBaseName = "${config.mod_name}-${config.mc_version}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+mixin {
+    add sourceSets.main, "${config.mod_id}.refmap.json"
+
+    config "${config.mod_id}.mixins.json"
+}
+
+println "\nStarting build of ${config.mod_name}, Version: ${config.mod_version}"
+println "Using Forge: ${config.forge_version} and Core: ${config.core_version}, for Minecraft: ${config.mc_version}, with Mappings: ${config.mappings_version}-${config.mappings_channel}\n"
+
+minecraft {
+    mappings channel: "${config.mappings_channel}", version: "${config.mappings_version}"
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', "${config.mod_id}"
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
+            ideaModule "${rootProject.name}.${project.name}.main"
+
+            mods {
+                anvilapi {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', "${config.mod_id}"
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+
+            ideaModule "${rootProject.name}.${project.name}.main"
+
+            mods {
+                anvilapi {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven { url 'https://hantonikdev.jfrog.io/artifactory/mods' }
+
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
+
+    annotationProcessor "org.spongepowered:mixin:${config.mixin_processor_version}:processor"
+
+    implementation fg.deobf("hantonik.atomiccore:AtomicCore-${config.mc_version}:${config.core_version}")
+}
+
+task replaceResources(type: Copy) {
+    outputs.upToDateWhen { false }
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'META-INF/mods.toml'
+
+        expand  'mod_version': "$version",
+                'mod_name': "${config.mod_name}",
+                'core_version': "${config.supported_core_versions}"
+    }
+
+    into "$buildDir/resources/main/"
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'META-INF/mods.toml'
+    }
+
+    finalizedBy replaceResources
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": archivesBaseName,
+                "Specification-Vendor": "Hantonik",
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": version,
+                "Implementation-Vendor": "Hantonik",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+
+    finalizedBy('reobfJar')
+}
+
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allJava
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+
+            artifactId "$archivesBaseName"
+        }
+    }
+    repositories {
+        maven {
+            url "https://hantonikdev.jfrog.io/artifactory/mods/"
+
+            credentials {
+                username System.getenv("REPO_USER")
+                password System.getenv("REPO_PASSWORD")
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
