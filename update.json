@@ -2,11 +2,12 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
 
   "promos": {
-    "1.19.2-latest": "1.1.0.0",
-    "1.19.2-recommended": "1.1.0.0"
+    "1.19.2-latest": "1.3.0.0",
+    "1.19.2-recommended": "1.3.0.0"
   },
 
   "1.19.2": {
+    "1.3.0.0": "Fixed a lot of bugs & redesigned recipe script",
     "1.1.0.0": "Initial release for Minecraft 1.19.2"
   }
 }
