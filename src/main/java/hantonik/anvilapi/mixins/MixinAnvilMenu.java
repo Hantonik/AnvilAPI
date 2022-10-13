@@ -1,7 +1,7 @@
 package hantonik.anvilapi.mixins;
 
-import hantonik.anvilapi.init.Recipes;
-import hantonik.atomiccore.utils.helpers.StackHelper;
+import hantonik.anvilapi.init.AARecipeTypes;
+import hantonik.atomic.core.utils.helpers.ItemHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Containers;
@@ -32,12 +32,12 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     @Shadow
     public int repairItemCountCost;
 
-    @Shadow
-    public abstract void createResult();
-
     public MixinAnvilMenu(@Nullable MenuType<?> type, int containerId, Inventory container, ContainerLevelAccess access) {
         super(type, containerId, container, access);
     }
+
+    @Shadow
+    public abstract void createResult();
 
     @Inject(at = @At("HEAD"), method = "mayPickup", cancellable = true)
     protected void mayPickup(Player player, boolean b, CallbackInfoReturnable<Boolean> callback) {
@@ -55,110 +55,84 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
         var breakChance = ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
 
-        var recipe = this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
+        var recipe = this.player.level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
 
         if (recipe != null) {
-            var input1SlotId = recipe.getInput1().test(this.inputSlots.getItem(0)) ? 0 : 1;
+            var input1 = this.inputSlots.getItem(0);
+            var input2 = this.inputSlots.getItem(1);
 
-            var input1 = this.inputSlots.getItem(input1SlotId);
-            var input1Return = recipe.getInput1Return().copy();
+            var input1Slot = 0;
+            var input2Slot = 1;
 
-            if (recipe.consumeInput1()) {
-                if (recipe.ignoreInput1Durability()) {
-                    input1.shrink(recipe.getInput1Amount());
+            if (!(recipe.getInput(0).test(this.inputSlots.getItem(0)) && recipe.getInput(1).test(this.inputSlots.getItem(1)))) {
+                input1 = this.inputSlots.getItem(1);
+                input2 = this.inputSlots.getItem(0);
 
-                    this.inputSlots.setItem(input1SlotId, input1);
-                } else {
-                    if (input1.isDamageableItem()) {
-                        var damage = input1.getDamageValue() + recipe.getInput1Amount();
-
-                        input1.setDamageValue(damage);
-
-                        if (damage < input1.getMaxDamage())
-                            this.inputSlots.setItem(input1SlotId, input1);
-                        else {
-                            input1.shrink(1);
-                            this.inputSlots.setItem(input1SlotId, input1);
-
-                            this.access.execute((level, pos) -> level.levelEvent(1029, pos, 0));
-                        }
-                    } else {
-                        input1.shrink(recipe.getInput1Amount());
-
-                        this.inputSlots.setItem(input1SlotId, input1);
-                    }
-                }
-
-                if (!input1Return.isEmpty()) {
-                    if (input1.isEmpty())
-                        this.inputSlots.setItem(input1SlotId, input1Return);
-                    else if (StackHelper.canCombineStacks(input1Return, input1))
-                        this.inputSlots.setItem(input1SlotId, StackHelper.combineStacks(input1Return, input1));
-                    else
-                        this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
-                }
-            } else {
-                if (!input1Return.isEmpty()) {
-                    if (StackHelper.canCombineStacks(input1Return, input1))
-                        this.inputSlots.setItem(input1SlotId, StackHelper.combineStacks(input1Return, input1));
-                    else
-                        this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input1Return));
-                }
-
-                this.createResult();
+                input1Slot = 1;
+                input2Slot = 0;
             }
 
-            var input2SlotId = recipe.getInput2().test(this.inputSlots.getItem(1)) ? 1 : 0;
+            if (recipe.isConsuming(0)) {
+                if (recipe.isUsingDurability(0) && input1.isDamageableItem()) {
+                    var damage = input1.getDamageValue() + recipe.getInputCount(0);
 
-            var input2 = this.inputSlots.getItem(input2SlotId);
-            var input2Return = recipe.getInput2Return().copy();
+                    input1.setDamageValue(damage);
 
-            if (recipe.consumeInput2()) {
-                if (recipe.ignoreInput2Durability()) {
-                    input2.shrink(recipe.getInput2Amount());
+                    if (damage >= input1.getMaxDamage()) {
+                        input1.shrink(1);
 
-                    this.inputSlots.setItem(input2SlotId, input2);
-                } else {
-                    if (input2.isDamageableItem()) {
-                        var damage = input2.getDamageValue() + recipe.getInput2Amount();
-
-                        input2.setDamageValue(damage);
-
-                        if (damage < input2.getMaxDamage())
-                            this.inputSlots.setItem(input2SlotId, input2);
-                        else {
-                            input2.shrink(1);
-                            this.inputSlots.setItem(input2SlotId, input2);
-
-                            this.access.execute((level, pos) -> level.levelEvent(1029, pos, 0));
-                        }
-                    } else {
-                        input2.shrink(recipe.getInput2Amount());
-
-                        this.inputSlots.setItem(input2SlotId, input2);
+                        this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0)));
                     }
-                }
-
-                if (!input2Return.isEmpty()) {
-                    if (input2.isEmpty())
-                        this.inputSlots.setItem(input2SlotId, input2Return);
-                    else if (StackHelper.canCombineStacks(input2Return, input2))
-                        this.inputSlots.setItem(input2SlotId, StackHelper.combineStacks(input2Return, input2));
-                    else
-                        this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
-                }
-            } else {
-                if (!input2Return.isEmpty()) {
-                    if (StackHelper.canCombineStacks(input2Return, input2))
-                        this.inputSlots.setItem(input2SlotId, StackHelper.combineStacks(input2Return, input2));
-                    else
-                        this.access.execute((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1.0F, pos.getZ(), input2Return));
-                }
-
-                this.createResult();
+                } else
+                    input1.shrink(recipe.getInputCount(0));
             }
 
-            this.broadcastChanges();
+            if (!recipe.getReturn(0).isEmpty()) {
+                var returnItem = recipe.getReturn(0).copy();
+
+                if (input1.isEmpty())
+                    this.inputSlots.setItem(input1Slot, returnItem);
+                else {
+                    if (!recipe.isUsingDurability(0)) {
+                        if (ItemHelper.canCombineStacks(input1, returnItem))
+                            this.inputSlots.setItem(input1Slot, ItemHelper.combineStacks(input1, returnItem));
+                        else
+                            this.access.execute(((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), returnItem)));
+                    }
+                }
+            }
+
+            if (recipe.isConsuming(1)) {
+                if (recipe.isUsingDurability(1) && input2.isDamageableItem()) {
+                    var damage = input2.getDamageValue() + recipe.getInputCount(1);
+
+                    input2.setDamageValue(damage);
+
+                    if (damage >= input2.getMaxDamage()) {
+                        input2.shrink(1);
+
+                        this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0)));
+                    }
+                } else
+                    input2.shrink(recipe.getInputCount(1));
+            }
+
+            if (!recipe.getReturn(1).isEmpty()) {
+                var returnItem = recipe.getReturn(1).copy();
+
+                if (input2.isEmpty())
+                    this.inputSlots.setItem(input2Slot, returnItem);
+                else {
+                    if (!recipe.isUsingDurability(1)) {
+                        if (ItemHelper.canCombineStacks(input2, returnItem))
+                            this.inputSlots.setItem(input2Slot, ItemHelper.combineStacks(input2, returnItem));
+                        else
+                            this.access.execute(((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), returnItem)));
+                    }
+                }
+            }
+
+            this.createResult();
         } else {
             this.inputSlots.setItem(0, ItemStack.EMPTY);
 
@@ -197,13 +171,12 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     @Inject(at = @At("HEAD"), method = "createResult", cancellable = true)
     public void createResult(CallbackInfo callback) {
-        var recipe = this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
+        var recipe = this.player.level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
 
         if (recipe != null) {
-            ItemStack stack = recipe.getResultItem();
-            ItemStack output = stack.copy();
-
-            int exp = recipe.getExperience();
+            var stack = recipe.getResultItem();
+            var output = recipe.assemble(this.inputSlots);
+            var exp = recipe.getExperience();
 
             if (StringUtils.isBlank(this.itemName)) {
                 if (stack.hasCustomHoverName()) {

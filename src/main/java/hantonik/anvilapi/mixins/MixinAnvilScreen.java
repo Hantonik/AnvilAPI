@@ -1,6 +1,6 @@
 package hantonik.anvilapi.mixins;
 
-import hantonik.anvilapi.init.Recipes;
+import hantonik.anvilapi.init.AARecipeTypes;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
@@ -40,10 +40,10 @@ public abstract class MixinAnvilScreen extends ItemCombinerScreen<AnvilMenu> {
             this.setFocused(this.name);
         }
 
-        var recipe = this.player.level.getRecipeManager().getRecipeFor(Recipes.ANVIL.get(), new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), this.player.level).orElse(null);
+        var recipe = this.player.level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), this.player.level).orElse(null);
 
         if (recipe != null) {
-            this.name.setValue(menu.getSlot(2).hasItem() ? recipe.getOutputName().getString() : "");
+            this.name.setValue(menu.getSlot(2).hasItem() ? menu.getSlot(2).getItem().getHoverName().getString() : "");
             this.name.setEditable(menu.getSlot(2).hasItem());
 
             this.setFocused(this.name);
