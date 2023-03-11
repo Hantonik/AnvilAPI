@@ -30,4 +30,3 @@ forge*changelog.txt
 /.idea/
 /.gradle/
 /src/test/
-/src/generated/
