@@ -3,7 +3,7 @@ package hantonik.anvilapi.integration.category;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
-import hantonik.atomic.core.utils.helpers.ItemHelper;
+import hantonik.anvilapi.utils.ItemHelper;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -28,11 +28,20 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
     private final IDrawable background;
     private final IDrawable shapeless;
     private final IDrawable icon;
+    private final IDrawable returnSlot;
 
     public AnvilRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 152, 77);
+        this.background = helper.createDrawable(TEXTURE, 0, 0, 152, 113);
         this.shapeless = helper.createDrawable(TEXTURE, 153, 0, 18, 16);
+
+        this.returnSlot = helper.createDrawable(TEXTURE, 0, 115, 18, 32);
+
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Blocks.ANVIL));
+    }
+
+    @Override
+    public int getHeight() {
+        return IRecipeCategory.super.getHeight();
     }
 
     @Override
@@ -65,8 +74,16 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
         if (recipe.isShapeless())
             this.shapeless.draw(stack, 135, 62);
 
+        if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
+            if (!recipe.getReturn(0).isEmpty())
+                this.returnSlot.draw(stack, 9, 60);
+
+            if (!recipe.getReturn(1).isEmpty())
+                this.returnSlot.draw(stack, 58, 60);
+        }
+
         if (recipe.getExperience() > 0)
-            font.drawShadow(stack, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, 66, (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+            font.drawShadow(stack, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty) ? 95 : 66), (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
     }
 
     @Override
@@ -75,5 +92,13 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
         builder.addSlot(RecipeIngredientRole.INPUT, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> ItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList());
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 40).addItemStack(recipe.getResultItem());
+
+        if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
+            if (!recipe.getReturn(0).isEmpty())
+                builder.addSlot(RecipeIngredientRole.OUTPUT, 10, 75).addItemStack(recipe.getReturn(0));
+
+            if (!recipe.getReturn(1).isEmpty())
+                builder.addSlot(RecipeIngredientRole.OUTPUT, 59, 75).addItemStack(recipe.getReturn(1));
+        }
     }
 }
