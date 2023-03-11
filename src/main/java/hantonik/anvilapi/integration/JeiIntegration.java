@@ -3,7 +3,7 @@ package hantonik.anvilapi.integration;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
 import hantonik.anvilapi.integration.category.AnvilRecipeCategory;
-import hantonik.atomic.core.utils.helpers.RecipeHelper;
+import hantonik.anvilapi.utils.RecipeHelper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;

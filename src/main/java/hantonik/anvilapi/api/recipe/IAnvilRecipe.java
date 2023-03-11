@@ -1,13 +1,14 @@
 package hantonik.anvilapi.api.recipe;
 
-import hantonik.atomic.core.api.recipe.ISpecialRecipe;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 
 import java.util.List;
 
-public interface IAnvilRecipe extends ISpecialRecipe {
+public interface IAnvilRecipe extends Recipe<Container> {
     @Override
     NonNullList<Ingredient> getIngredients();
 

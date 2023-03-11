@@ -6,25 +6,43 @@ import com.google.gson.JsonObject;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.atomic.core.crafting.recipe.AbstractRecipeBuilder;
-import hantonik.atomic.core.utils.helpers.ItemHelper;
+import hantonik.anvilapi.utils.ItemHelper;
+import lombok.Getter;
 import net.minecraft.Util;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.EntityPredicate;
+import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements IAnvilRecipe {
+public class AnvilRecipe implements IAnvilRecipe {
+    private final ResourceLocation serializerName;
+
+    private final List<ICondition> conditions = Lists.newArrayList();
+    private final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
+
     private final ResourceLocation id;
     private final ItemStack result;
     private final NonNullList<Ingredient> inputs;
@@ -45,7 +63,7 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
     }
 
     protected AnvilRecipe(ResourceLocation id, ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
-        super(new ResourceLocation("anvil"));
+        this.serializerName = new ResourceLocation("anvil");
 
         this.id = id;
         this.result = result;
@@ -158,16 +176,16 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
     }
 
     @Override
-    public ItemStack assemble(IItemHandler inventory) {
+    public ItemStack assemble(Container container) {
         return this.result.copy();
     }
 
     @Override
-    public boolean matches(IItemHandler inventory) {
+    public boolean matches(Container container, Level level) {
         NonNullList<ItemStack> inputs = NonNullList.create();
 
-        inputs.add(inventory.getStackInSlot(0));
-        inputs.add(inventory.getStackInSlot(1));
+        inputs.add(container.getItem(0));
+        inputs.add(container.getItem(1));
 
         if (this.shapeless) {
             List<Integer> checked = Lists.newArrayList();
@@ -200,7 +218,7 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
                     if (input.getCount() < ingredientCount)
                         continue;
 
-                    if (!flag && ingredient.test(input)) {
+                    if (ingredient.test(input)) {
                         flag = true;
 
                         checked.add(inputId);
@@ -233,15 +251,26 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
         return AARecipeSerializers.ANVIL.get();
     }
 
-    @Override
-    protected AbstractRecipeBuilder<AnvilRecipe>.RecipeResult getResult(ResourceLocation id) {
-        return new Result(id);
+    public AnvilRecipe addCriterion(String name, CriterionTriggerInstance criterion) {
+        this.advancementBuilder.addCriterion(name, criterion);
+
+        return this;
+    }
+
+    public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
+        if (this.advancementBuilder.getCriteria().isEmpty())
+            throw new IllegalStateException("No way of obtaining recipe " + id);
+
+        this.advancementBuilder.parent(new ResourceLocation("recipes/root"))
+                .addCriterion("has_the_recipe", new RecipeUnlockedTrigger.TriggerInstance(EntityPredicate.Composite.ANY, id))
+                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
+        consumer.accept(new Result(id));
     }
 
     public static class Serializer implements RecipeSerializer<IAnvilRecipe> {
         @Override
         public IAnvilRecipe fromJson(ResourceLocation id, JsonObject json) {
-            var result = ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(json, "result"));
+            var result = CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true, false);
 
             NonNullList<Ingredient> inputs = NonNullList.create();
             NonNullList<ItemStack> returns = NonNullList.create();
@@ -252,7 +281,7 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
             for (var inputElement : GsonHelper.getAsJsonArray(json, "inputs")) {
                 inputs.add(Ingredient.fromJson(inputElement));
 
-                returns.add(inputElement.getAsJsonObject().has("return") ? ItemHelper.deserializeStack(GsonHelper.getAsJsonObject(inputElement.getAsJsonObject(), "return")) : ItemStack.EMPTY);
+                returns.add(inputElement.getAsJsonObject().has("return") ? CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(inputElement.getAsJsonObject(), "return"), true, false) : ItemStack.EMPTY);
                 counts.add(inputElement.getAsJsonObject().has("count") ? GsonHelper.getAsInt(inputElement.getAsJsonObject(), "count") : 1);
                 consumes.add(!inputElement.getAsJsonObject().has("consume") || GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "consume"));
                 useDurability.add(inputElement.getAsJsonObject().has("useDurability") && GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "useDurability"));
@@ -343,9 +372,35 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
         }
     }
 
-    private class Result extends RecipeResult {
+    private class Result implements FinishedRecipe {
+        @Getter
+        private final ResourceLocation id;
+        @Getter
+        private final ResourceLocation advancementId;
+
         Result(ResourceLocation id) {
-            super(id);
+            this.id = id;
+            this.advancementId = new ResourceLocation(id.getNamespace(), "recipes/" + id.getPath());
+        }
+
+        @Override
+        public JsonObject serializeRecipe() {
+            var jsonObject = new JsonObject();
+
+            jsonObject.addProperty("type", serializerName.toString());
+
+            if (!conditions.isEmpty()) {
+                var conditionsArray = new JsonArray();
+
+                for (var condition : conditions)
+                    conditionsArray.add(CraftingHelper.serialize(condition));
+
+                jsonObject.add("conditions", conditionsArray);
+            }
+
+            this.serializeRecipeData(jsonObject);
+
+            return jsonObject;
         }
 
         @Override
@@ -371,9 +426,21 @@ public class AnvilRecipe extends AbstractRecipeBuilder<AnvilRecipe> implements I
             json.add("result", ItemHelper.serialize(result));
 
             if (shapeless)
-                json.addProperty("shapeless", shapeless);
+                json.addProperty("shapeless", true);
 
             json.addProperty("experience", experience);
+        }
+
+        @Nonnull
+        @Override
+        public RecipeSerializer<?> getType() {
+            return ForgeRegistries.RECIPE_SERIALIZERS.getValue(serializerName);
+        }
+
+        @Nullable
+        @Override
+        public JsonObject serializeAdvancement() {
+            return advancementBuilder.serializeToJson();
         }
     }
 }
