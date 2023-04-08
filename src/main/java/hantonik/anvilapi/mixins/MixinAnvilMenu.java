@@ -172,11 +172,12 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     @Inject(at = @At("HEAD"), method = "createResult", cancellable = true)
     public void createResult(CallbackInfo callback) {
-        var recipe = this.player.level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
+        var level = this.player.level;
+        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
 
         if (recipe != null) {
-            var stack = recipe.getResultItem();
-            var output = recipe.assemble(this.inputSlots);
+            var stack = recipe.getResultItem(level.registryAccess());
+            var output = recipe.assemble(this.inputSlots, level.registryAccess());
             var exp = recipe.getExperience();
 
             if (StringUtils.isBlank(this.itemName)) {

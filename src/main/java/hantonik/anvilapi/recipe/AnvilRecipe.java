@@ -16,6 +16,7 @@ import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -176,8 +177,8 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public ItemStack assemble(Container container) {
-        return this.result.copy();
+    public ItemStack assemble(Container p_44001_, RegistryAccess access) {
+        return this.getResultItem(access).copy();
     }
 
     @Override
