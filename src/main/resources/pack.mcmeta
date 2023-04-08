@@ -1,9 +1,10 @@
 {
     "pack": {
-        "description": "AnvilAPI resources",
-        "pack_format": 12,
+        "description": {
+            "text": "AnvilAPI resources"
+        },
 
-        "forge:resource_pack_format": 12,
-        "forge:data_pack_format": 10
+        "forge:server_data_pack_format": 12,
+        "pack_format": 13
     }
 }
