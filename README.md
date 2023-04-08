@@ -1,4 +1,4 @@
-# AnvilAPI [![CurseForge](http://cf.way2muchnoise.eu/full_634377_downloads.svg)](https://curseforge.com/minecraft/mc-mods/atomiccore) [![CurseForge](http://cf.way2muchnoise.eu/versions/For%20MC_634377_all.svg)](https://curseforge.com/minecraft/mc-mods/atomiccore)
+# AnvilAPI [![CurseForge](http://cf.way2muchnoise.eu/full_634377_downloads.svg)](https://curseforge.com/minecraft/mc-mods/anvilapi) [![CurseForge](http://cf.way2muchnoise.eu/versions/For%20MC_634377_all.svg)](https://curseforge.com/minecraft/mc-mods/anvilapi)
 [![image](https://imgur.com/LHUPcn3.png)](https://curseforge.com/minecraft/mc-mods/anvilapi "You can download this mod here!")\
 <span style="color: #ffcc00;">**AnvilAPI**</span> is a mod that adds to the game the ability to create your own dream **anvil recipes**.
 
