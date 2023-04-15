@@ -7,6 +7,11 @@
 By uploading this mod, you gain the ability to add anvil recipes to the game using datapacks. In addition to the obvious customization of ingredients and results, and their amounts, you can also choose whether the input will be consumed, what it will return, and the amount of XP required.\
 Items with durability will be able to consume it instead of the whole item if you choose to!
 
+## Downloads
+
+Download from [CurseForge](https://curseforge.com/minecraft/mc-mods/anvilapi "Then just click download ;)")\
+Download from [Modrinth](https://modrinth.com/mod/anvilapi "Then just click download ;)")
+
 ## Wiki
 
 Here is an example anvil recipe file:
@@ -35,11 +40,6 @@ Here is an example anvil recipe file:
 **For more information**, see the full documentation [here](https://github.com/Hantonik/AnvilAPI/wiki "Here you will find answers to (almost) all your questions!").
 
 **Yes, you can use this mod in your modpack! That's literally what it was made for!**
-
-## Downloads
-
-Download from [CurseForge](https://curseforge.com/minecraft/mc-mods/anvilapi "Then just click download ;)")\
-Download from [Modrinth](https://modrinth.com/mod/anvilapi "Then just click download ;)")
 
 ## Contribution
 
