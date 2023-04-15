@@ -38,7 +38,8 @@ Here is an example anvil recipe file:
 
 ## Downloads
 
-[Minecraft 1.19.4](https://curseforge.com/minecraft/mc-mods/anvilapi/files/all?filter-game-version=2020709689:9776 "Then click download ;)")
+Download from [CurseForge](https://curseforge.com/minecraft/mc-mods/anvilapi "Then just click download ;)")\
+Download from [Modrinth](https://modrinth.com/mod/anvilapi "Then just click download ;)")
 
 ## Contribution
 
@@ -51,3 +52,8 @@ Here is an example anvil recipe file:
 
 <em><span style="font-family: 'comic sans ms', sans-serif; color: #999999">"If you want to use my code, feel free, but remember to mention whose code it is!</span></em>
 <em><p style="padding-left: 5px;"><span style="font-family: 'comic sans ms', sans-serif; color: #999999">Take care, author."</span></p></em>
+
+## Support
+<a title="Thanks!" href="https://www.buymeacoffee.com/hantonik"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&amp;emoji=&amp;slug=hantonik&amp;button_colour=FFDD00&amp;font_colour=000000&amp;font_family=Cookie&amp;outline_colour=000000&amp;coffee_colour=ffffff" /></a>
+
+**I do it out of passion**, but if you want to appreciate my work, you can do it by [buying me a coffee](https://www.buymeacoffee.com/hantonik "Here!"), **thanks <3**!
