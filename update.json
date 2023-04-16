@@ -2,7 +2,8 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
 
   "promos": {
-    "1.19.4-latest": "2.1.0.0",
+    "1.19.4-latest": "2.1.0.1",
+    "1.19.4-recommended": "2.1.0.1",
 
     "1.19.3-latest": "2.0.0.0",
 
@@ -11,6 +12,7 @@
   },
 
   "1.19.4": {
+    "2.1.0.1": "Code optimizations",
     "2.1.0.0": "Release for Minecraft 1.19.4"
   },
 
