@@ -69,7 +69,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
         var font = Minecraft.getInstance().font;
         var player = Minecraft.getInstance().player;
 
-        font.drawShadow(stack, Component.literal(recipe.getResultItem().getHoverName().getString()), 46, 17, 0xFFFFFFFF);
+        font.drawShadow(stack, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), 46, 17, 0xFFFFFFFF);
 
         if (recipe.isShapeless())
             this.shapeless.draw(stack, 135, 62);
@@ -91,7 +91,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
         builder.addSlot(RecipeIngredientRole.INPUT, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> ItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList());
         builder.addSlot(RecipeIngredientRole.INPUT, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> ItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList());
 
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 40).addItemStack(recipe.getResultItem());
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 40).addItemStack(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
 
         if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
             if (!recipe.getReturn(0).isEmpty())
