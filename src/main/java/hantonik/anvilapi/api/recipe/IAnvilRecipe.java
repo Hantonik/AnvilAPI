@@ -1,7 +1,6 @@
 package hantonik.anvilapi.api.recipe;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -34,11 +33,4 @@ public interface IAnvilRecipe extends Recipe<Container> {
     boolean isShapeless();
 
     int getExperience();
-
-    ItemStack getResultItem();
-
-    @Override
-    default ItemStack getResultItem(RegistryAccess access) {
-        return this.getResultItem();
-    }
 }
