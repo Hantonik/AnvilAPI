@@ -15,6 +15,7 @@ import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -112,7 +113,7 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public ItemStack getResultItem() {
+    public ItemStack getResultItem(RegistryAccess access) {
         return this.result;
     }
 
@@ -283,9 +284,9 @@ public class AnvilRecipe implements IAnvilRecipe {
                 inputs.add(Ingredient.fromJson(inputElement));
 
                 returns.add(inputElement.getAsJsonObject().has("return") ? CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(inputElement.getAsJsonObject(), "return"), true, false) : ItemStack.EMPTY);
-                counts.add(inputElement.getAsJsonObject().has("count") ? GsonHelper.getAsInt(inputElement.getAsJsonObject(), "count") : 1);
-                consumes.add(!inputElement.getAsJsonObject().has("consume") || GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "consume"));
-                useDurability.add(inputElement.getAsJsonObject().has("useDurability") && GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "useDurability"));
+                counts.add(GsonHelper.getAsInt(inputElement.getAsJsonObject(), "count", 1));
+                consumes.add(GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "consume", true));
+                useDurability.add(GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "useDurability", false));
             }
 
             var shapeless = false;
@@ -293,7 +294,7 @@ public class AnvilRecipe implements IAnvilRecipe {
             if (json.has("shapeless"))
                 shapeless = GsonHelper.getAsBoolean(json, "shapeless");
 
-            var experience = GsonHelper.getAsInt(json, "experience");
+            var experience = GsonHelper.getAsInt(json, "experience", 0);
 
             return new AnvilRecipe(id, result, inputs, returns, consumes, useDurability, counts, shapeless, experience);
         }
@@ -341,7 +342,7 @@ public class AnvilRecipe implements IAnvilRecipe {
 
         @Override
         public void toNetwork(FriendlyByteBuf buffer, IAnvilRecipe recipe) {
-            buffer.writeItem(recipe.getResultItem());
+            buffer.writeItem(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
 
             buffer.writeInt(recipe.getIngredients().size());
 
@@ -429,7 +430,8 @@ public class AnvilRecipe implements IAnvilRecipe {
             if (shapeless)
                 json.addProperty("shapeless", true);
 
-            json.addProperty("experience", experience);
+            if (experience != 0)
+                json.addProperty("experience", experience);
         }
 
         @Nonnull
