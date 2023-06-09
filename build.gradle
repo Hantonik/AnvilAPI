@@ -1,5 +1,5 @@
 plugins {
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
     id 'io.freefair.lombok' version '6.6.+'
 
@@ -13,9 +13,12 @@ file('gradle.properties').withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
-version = "$mod_version"
+version = mod_version
 group = "hantonik.$mod_id"
-archivesBaseName = "$mod_name-$mc_version"
+
+base {
+    archivesName = "$mod_name-$mc_version"
+}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -29,7 +32,9 @@ println "\nStarting build of $mod_name, Version: $mod_version"
 println "Using Forge: $forge_version, for Minecraft: $mc_version, with Mappings: $mappings_version-$mappings_channel\n"
 
 minecraft {
-    mappings channel: "$mappings_channel", version: "$mappings_version"
+    mappings channel: mappings_channel, version: mappings_version
+
+    copyIdeResources = true
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -120,11 +125,11 @@ processResources {
 jar {
     manifest {
         attributes([
-                "Specification-Title": archivesBaseName,
+                "Specification-Title": mod_id,
                 "Specification-Vendor": "Hantonik",
                 "Specification-Version": "1",
                 "Implementation-Title": project.name,
-                "Implementation-Version": version,
+                "Implementation-Version": project.jar.archiveVersion,
                 "Implementation-Vendor": "Hantonik",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -134,7 +139,7 @@ jar {
 }
 
 task sourcesJar(type: Jar) {
-    classifier = "sources"
+    archiveClassifier = "sources"
     from sourceSets.main.allJava
 }
 
