@@ -33,6 +33,8 @@ public abstract class MixinAnvilScreen extends ItemCombinerScreen<AnvilMenu> {
 
     @Inject(at = @At("HEAD"), method = "slotChanged", cancellable = true)
     public void slotChanged(AbstractContainerMenu menu, int slot, ItemStack stack, CallbackInfo callback) {
+        var level = this.player.level();
+
         if (slot != 2) {
             this.name.setValue(menu.getSlot(0).hasItem() ? menu.getSlot(0).getItem().getHoverName().getString() : "");
             this.name.setEditable(menu.getSlot(0).hasItem());
@@ -40,7 +42,7 @@ public abstract class MixinAnvilScreen extends ItemCombinerScreen<AnvilMenu> {
             this.setFocused(this.name);
         }
 
-        var recipe = this.player.level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), this.player.level).orElse(null);
+        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), level).orElse(null);
 
         if (recipe != null) {
             this.name.setValue(menu.getSlot(2).hasItem() ? menu.getSlot(2).getItem().getHoverName().getString() : "");

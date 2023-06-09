@@ -43,7 +43,7 @@ public final class ItemHelper {
     }
 
     public static boolean areItemsEqual(ItemStack stack1, ItemStack stack2) {
-        return !stack1.isEmpty() && !stack2.isEmpty() && stack1.sameItem(stack2);
+        return !stack1.isEmpty() && !stack2.isEmpty() && stack1.is(stack2.getItem());
     }
 
     public static boolean areStacksEqual(ItemStack stack1, ItemStack stack2) {

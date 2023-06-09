@@ -1,6 +1,5 @@
 package hantonik.anvilapi.integration.category;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.utils.ItemHelper;
@@ -14,6 +13,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -65,25 +65,25 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
     }
 
     @Override
-    public void draw(IAnvilRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
+    public void draw(IAnvilRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
         var font = Minecraft.getInstance().font;
         var player = Minecraft.getInstance().player;
 
-        font.drawShadow(stack, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), 46, 17, 0xFFFFFFFF);
+        graphics.drawString(font, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), 46, 17, 0xFFFFFFFF);
 
         if (recipe.isShapeless())
-            this.shapeless.draw(stack, 135, 62);
+            this.shapeless.draw(graphics, 135, 62);
 
         if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
             if (!recipe.getReturn(0).isEmpty())
-                this.returnSlot.draw(stack, 9, 60);
+                this.returnSlot.draw(graphics, 9, 60);
 
             if (!recipe.getReturn(1).isEmpty())
-                this.returnSlot.draw(stack, 58, 60);
+                this.returnSlot.draw(graphics, 58, 60);
         }
 
         if (recipe.getExperience() > 0)
-            font.drawShadow(stack, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty) ? 95 : 66), (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+            graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty) ? 95 : 66), (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
     }
 
     @Override

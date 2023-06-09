@@ -55,7 +55,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
         var breakChance = ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
 
-        var recipe = this.player.level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
+        var recipe = this.player.level().getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level()).orElse(null);
 
         if (recipe != null) {
             var input1 = this.inputSlots.getItem(0);
@@ -172,8 +172,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     @Inject(at = @At("HEAD"), method = "createResult", cancellable = true)
     public void createResult(CallbackInfo callback) {
-        var level = this.player.level;
-        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level).orElse(null);
+        var level = this.player.level();
+        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, level).orElse(null);
 
         if (recipe != null) {
             var stack = recipe.getResultItem(level.registryAccess());
