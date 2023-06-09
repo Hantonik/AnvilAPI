@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[45,)"
+loaderVersion="[46,)"
 license="MIT"
 issueTrackerURL="https://github.com/Hantonik/AnvilAPI/issues"
 
@@ -9,7 +9,7 @@ issueTrackerURL="https://github.com/Hantonik/AnvilAPI/issues"
     displayName="${mod_name}"
     displayURL="https://www.curseforge.com/minecraft/mc-mods/anvilapi"
     logoFile="logo.png"
-    updateJSONURL="https://raw.githubusercontent.com/Hantonik/AnvilAPI/1.19.4/update.json"
+    updateJSONURL="https://raw.githubusercontent.com/Hantonik/AnvilAPI/1.20/update.json"
     authors="Hantonik"
     description='''AnvilAPI adds to the game the ability to create custom anvil recipes by datapacks.
 '''
@@ -17,13 +17,13 @@ issueTrackerURL="https://github.com/Hantonik/AnvilAPI/issues"
 [[dependencies.anvilapi]]
     modId="forge"
     mandatory=true
-    versionRange="[45,)"
+    versionRange="[46,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.anvilapi]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.4,)"
+    versionRange="[1.20,)"
     ordering="NONE"
     side="BOTH"
