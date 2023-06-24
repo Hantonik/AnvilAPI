@@ -23,4 +23,3 @@ Please add your logs and scripts (if applicable).
 - Minecraft:
 - Forge:
 - AnvilAPI:
-- AtomicCore:
