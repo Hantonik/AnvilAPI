@@ -86,8 +86,23 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @CanIgnoreReturnValue
+    public AnvilRecipe shapeless(boolean shapeless) {
+        this.shapeless = shapeless;
+
+        return this;
+    }
+
+    @CanIgnoreReturnValue
     public AnvilRecipe consume(int inputId, boolean consume) {
         this.consumes.set(inputId, this.useDurability.get(inputId) || consume);
+
+        return this;
+    }
+
+    @CanIgnoreReturnValue
+    public AnvilRecipe setUseDurability(int inputId, boolean useDurability) {
+        this.useDurability.set(inputId, useDurability);
+        this.consumes.set(inputId, useDurability || this.consumes.get(inputId));
 
         return this;
     }
