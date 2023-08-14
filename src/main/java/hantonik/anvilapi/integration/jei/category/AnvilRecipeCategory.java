@@ -1,4 +1,4 @@
-package hantonik.anvilapi.integration.category;
+package hantonik.anvilapi.integration.jei.category;
 
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
@@ -37,11 +37,6 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
         this.returnSlot = helper.createDrawable(TEXTURE, 0, 115, 18, 32);
 
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Blocks.ANVIL));
-    }
-
-    @Override
-    public int getHeight() {
-        return IRecipeCategory.super.getHeight();
     }
 
     @Override

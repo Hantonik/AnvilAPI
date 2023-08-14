@@ -1,8 +1,8 @@
-package hantonik.anvilapi.integration;
+package hantonik.anvilapi.integration.jei;
 
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.anvilapi.integration.category.AnvilRecipeCategory;
+import hantonik.anvilapi.integration.jei.category.AnvilRecipeCategory;
 import hantonik.anvilapi.utils.RecipeHelper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
