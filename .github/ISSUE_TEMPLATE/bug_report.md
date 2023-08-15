@@ -21,5 +21,5 @@ Please add your logs and scripts (if applicable).
 
 **Versions (please complete the following information):**
 - Minecraft:
-- Forge:
+- Forge/Fabric:
 - AnvilAPI:
