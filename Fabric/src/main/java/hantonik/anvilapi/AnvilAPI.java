@@ -2,6 +2,7 @@ package hantonik.anvilapi;
 
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
+import hantonik.anvilapi.utils.AARecipeHelper;
 import net.fabricmc.api.ModInitializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,5 +17,7 @@ public final class AnvilAPI implements ModInitializer {
 
         AARecipeTypes.onInit();
         AARecipeSerializers.onInit();
+
+        AARecipeHelper.init();
     }
 }
