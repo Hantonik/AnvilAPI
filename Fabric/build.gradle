@@ -54,7 +54,7 @@ dependencies {
 
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-common-api:$jei_version"
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-fabric-api:$jei_version"
-	modImplementation "mezz.jei:jei-$mc_version-fabric:$jei_version"
+	modRuntimeOnly "mezz.jei:jei-$mc_version-fabric:$jei_version"
 
 	modImplementation "com.blamejared.crafttweaker:CraftTweaker-fabric-$mc_version:$crafttweaker_version"
 

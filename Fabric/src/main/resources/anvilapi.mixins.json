@@ -1,12 +1,14 @@
 {
-	"required": true,
-	"package": "hantonik.anvilapi.mixins",
-	"compatibilityLevel": "JAVA_17",
-	"mixins": [
-	],
-	"client": [
-		"MixinAnvilMenu",
-		"MixinAnvilScreen"
-	],
-	"minVersion": "0.8"
+  "required": true,
+  "package": "hantonik.anvilapi.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinReloadableServerResources"
+  ],
+  "client": [
+    "MixinAnvilMenu",
+    "MixinAnvilScreen",
+    "MixinClientPacketListener"
+  ],
+  "minVersion": "0.8"
 }
