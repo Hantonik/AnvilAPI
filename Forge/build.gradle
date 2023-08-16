@@ -1,0 +1,124 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'io.freefair.lombok' version '6.6.+'
+
+    id 'idea'
+    id 'maven-publish'
+}
+
+base {
+    archivesName = "$mod_name-$mc_version-forge"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+
+    config "${mod_id}.mixins.json"
+}
+
+println "Using Forge: $forge_version, for Minecraft: $mc_version, with Mappings: $official_mappings_version-official\n"
+
+minecraft {
+    mappings channel: 'official', version: official_mappings_version
+
+    copyIdeResources = true
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', "$mod_id"
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
+
+            ideaModule "${rootProject.name}.${project.name}.main"
+
+            mods {
+                anvilapi {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', "$mod_id"
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
+
+            ideaModule "${rootProject.name}.${project.name}.main"
+
+            mods {
+                anvilapi {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven { url 'https://maven.blamejared.com' }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
+
+    compileOnly fg.deobf("mezz.jei:jei-$mc_version-common-api:$jei_version")
+    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge-api:$jei_version")
+    implementation fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
+
+    implementation fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-$mc_version:$crafttweaker_version")
+
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+
+    annotationProcessor "org.spongepowered:mixin:$mixin_processor_version:processor"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+}
+
+jar.finalizedBy('reobfJar')
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+
+            artifactId "$archivesBaseName"
+        }
+    }
+    repositories {
+        maven {
+            url "https://hantonikdev.jfrog.io/artifactory/mods/"
+
+            credentials {
+                username System.getenv("REPO_USER")
+                password System.getenv("REPO_PASSWORD")
+            }
+        }
+    }
+}
