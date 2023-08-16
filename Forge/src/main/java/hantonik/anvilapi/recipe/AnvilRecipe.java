@@ -389,10 +389,9 @@ public class AnvilRecipe implements IAnvilRecipe {
         }
     }
 
+    @Getter
     private class Result implements FinishedRecipe {
-        @Getter
         private final ResourceLocation id;
-        @Getter
         private final ResourceLocation advancementId;
 
         Result(ResourceLocation id) {
