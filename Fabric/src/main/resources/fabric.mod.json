@@ -19,6 +19,10 @@
 	"entrypoints": {
 		"main": [
 			"hantonik.anvilapi.AnvilAPI"
+		],
+
+		"jei_mod_plugin": [
+			"hantonik.anvilapi.integration.jei.JeiIntegration"
 		]
 	},
 	"depends": {
