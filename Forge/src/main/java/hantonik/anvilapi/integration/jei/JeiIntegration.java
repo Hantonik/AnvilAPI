@@ -3,7 +3,7 @@ package hantonik.anvilapi.integration.jei;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
 import hantonik.anvilapi.integration.jei.category.AnvilRecipeCategory;
-import hantonik.anvilapi.utils.RecipeHelper;
+import hantonik.anvilapi.utils.AARecipeHelper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
@@ -31,7 +31,7 @@ public final class JeiIntegration implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(AnvilRecipeCategory.RECIPE_TYPE, RecipeHelper.getRecipeManager().getAllRecipesFor(AARecipeTypes.ANVIL.get()));
+        registration.addRecipes(AnvilRecipeCategory.RECIPE_TYPE, AARecipeHelper.getRecipeManager().getAllRecipesFor(AARecipeTypes.ANVIL.get()));
     }
 
     @Override

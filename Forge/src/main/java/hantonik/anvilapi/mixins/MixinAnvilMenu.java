@@ -1,7 +1,7 @@
 package hantonik.anvilapi.mixins;
 
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.anvilapi.utils.ItemHelper;
+import hantonik.anvilapi.utils.AAItemHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Containers;
@@ -94,8 +94,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                     this.inputSlots.setItem(input1Slot, returnItem);
                 else {
                     if (!recipe.isUsingDurability(0)) {
-                        if (ItemHelper.canCombineStacks(input1, returnItem))
-                            this.inputSlots.setItem(input1Slot, ItemHelper.combineStacks(input1, returnItem));
+                        if (AAItemHelper.canCombineStacks(input1, returnItem))
+                            this.inputSlots.setItem(input1Slot, AAItemHelper.combineStacks(input1, returnItem));
 
                         else
                             this.access.execute(((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), returnItem)));
@@ -125,8 +125,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                     this.inputSlots.setItem(input2Slot, returnItem);
                 else {
                     if (!recipe.isUsingDurability(1)) {
-                        if (ItemHelper.canCombineStacks(input2, returnItem))
-                            this.inputSlots.setItem(input2Slot, ItemHelper.combineStacks(input2, returnItem));
+                        if (AAItemHelper.canCombineStacks(input2, returnItem))
+                            this.inputSlots.setItem(input2Slot, AAItemHelper.combineStacks(input2, returnItem));
                         else
                             this.access.execute(((level, pos) -> Containers.dropItemStack(level, pos.getX(), pos.getY() + 1, pos.getZ(), returnItem)));
                     }

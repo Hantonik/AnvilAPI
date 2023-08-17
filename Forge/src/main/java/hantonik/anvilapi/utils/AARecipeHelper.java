@@ -15,7 +15,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class RecipeHelper {
+public final class AARecipeHelper {
     private static RecipeManager MANAGER;
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

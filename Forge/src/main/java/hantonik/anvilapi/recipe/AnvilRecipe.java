@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.anvilapi.utils.ItemHelper;
+import hantonik.anvilapi.utils.AAItemHelper;
 import lombok.Getter;
 import net.minecraft.Util;
 import net.minecraft.advancements.Advancement;
@@ -433,13 +433,13 @@ public class AnvilRecipe implements IAnvilRecipe {
                 if (useDurability.get(inputId))
                     inputJson.addProperty("useDurability", useDurability.get(inputId));
                 if (!returns.get(inputId).isEmpty())
-                    inputJson.add("return", ItemHelper.serialize(returns.get(inputId)));
+                    inputJson.add("return", AAItemHelper.serialize(returns.get(inputId)));
 
                 inputsJson.add(inputJson);
             }
 
             json.add("inputs", inputsJson);
-            json.add("result", ItemHelper.serialize(result));
+            json.add("result", AAItemHelper.serialize(result));
 
             if (shapeless)
                 json.addProperty("shapeless", true);

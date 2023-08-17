@@ -2,7 +2,7 @@ package hantonik.anvilapi;
 
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.anvilapi.utils.RecipeHelper;
+import hantonik.anvilapi.utils.AARecipeHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -36,7 +36,7 @@ public final class AnvilAPI {
     public void commonSetup(final FMLCommonSetupEvent event) {
         AnvilAPI.LOGGER.info(SETUP_MARKER, "Starting common setup...");
 
-        MinecraftForge.EVENT_BUS.register(new RecipeHelper());
+        MinecraftForge.EVENT_BUS.register(new AARecipeHelper());
 
         MinecraftForge.EVENT_BUS.register(this);
 
