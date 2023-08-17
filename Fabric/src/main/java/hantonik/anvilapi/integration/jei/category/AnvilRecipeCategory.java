@@ -78,7 +78,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
         }
 
         if (recipe.getExperience() > 0)
-            graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty) ? 95 : 66), (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+            graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty) ? 99 : 65), (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
     }
 
     @Override
