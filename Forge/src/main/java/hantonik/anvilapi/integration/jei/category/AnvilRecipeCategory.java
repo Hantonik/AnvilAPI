@@ -12,6 +12,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -83,8 +84,12 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, IAnvilRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(RecipeIngredientRole.INPUT, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> ItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList());
-        builder.addSlot(RecipeIngredientRole.INPUT, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> ItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList());
+        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList())
+                .addTooltipCallback(((slotView, tooltip) -> tooltip.add(Component.literal("Consumes: ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)))));
+
+        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList())
+                .addTooltipCallback(((slotView, tooltip) -> tooltip.add(Component.literal("Consumes: ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)))));
+
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 40).addItemStack(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
 
