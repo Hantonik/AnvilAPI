@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ItemHelper {
+public final class AAItemHelper {
     public static JsonObject serialize(ItemStack stack) {
         var json = new JsonObject();
 
