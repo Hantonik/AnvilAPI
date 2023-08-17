@@ -279,7 +279,7 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
-    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, IItemStack leftReturnItem, int leftInputCount, IIngredient rightInput, IItemStack rightReturnItem, int rightInputCount, int experience) {
+    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, int leftInputCount, IItemStack leftReturnItem, IIngredient rightInput, int rightInputCount, IItemStack rightReturnItem, int experience) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
@@ -319,7 +319,7 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
-    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, IItemStack leftReturnItem, int leftInputCount, IIngredient rightInput, IItemStack rightReturnItem, int rightInputCount, int experience, boolean shapeless) {
+    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, int leftInputCount, IItemStack leftReturnItem, IIngredient rightInput, int rightInputCount, IItemStack rightReturnItem, int experience, boolean shapeless) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
@@ -359,7 +359,7 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
-    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, IItemStack leftReturnItem, int leftInputCount, boolean consumeLeftInput, IIngredient rightInput, IItemStack rightReturnItem, int rightInputCount, boolean consumeRightInput, int experience) {
+    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, int leftInputCount, IItemStack leftReturnItem, boolean consumeLeftInput, IIngredient rightInput, int rightInputCount, IItemStack rightReturnItem, boolean consumeRightInput, int experience) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
@@ -399,7 +399,7 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
-    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, IItemStack leftReturnItem, int leftInputCount, boolean consumeLeftInput, IIngredient rightInput, IItemStack rightReturnItem, int rightInputCount, boolean consumeRightInput, int experience, boolean shapeless) {
+    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, int leftInputCount, IItemStack leftReturnItem, boolean consumeLeftInput, IIngredient rightInput, int rightInputCount, IItemStack rightReturnItem, boolean consumeRightInput, int experience, boolean shapeless) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
@@ -439,7 +439,7 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
-    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, IItemStack leftReturnItem, int leftInputCount, boolean consumeLeftInput, boolean useLeftItemDurability, IIngredient rightInput, IItemStack rightReturnItem, int rightInputCount, boolean consumeRightInput, boolean useRightItemDurability, int experience) {
+    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, int leftInputCount, IItemStack leftReturnItem, boolean consumeLeftInput, boolean useLeftItemDurability, IIngredient rightInput, int rightInputCount, IItemStack rightReturnItem, boolean consumeRightInput, boolean useRightItemDurability, int experience) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
@@ -479,7 +479,7 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
-    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, IItemStack leftReturnItem, int leftInputCount, boolean consumeLeftInput, boolean useLeftItemDurability, IIngredient rightInput, IItemStack rightReturnItem, int rightInputCount, boolean consumeRightInput, boolean useRightItemDurability, int experience, boolean shapeless) {
+    public static void addRecipe(String id, IItemStack result, IIngredient leftInput, int leftInputCount, IItemStack leftReturnItem, boolean consumeLeftInput, boolean useLeftItemDurability, IIngredient rightInput, int rightInputCount, IItemStack rightReturnItem, boolean consumeRightInput, boolean useRightItemDurability, int experience, boolean shapeless) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
