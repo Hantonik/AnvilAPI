@@ -12,7 +12,7 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println "Using Fabric: $fabric_version, Loader: $loader_version, for Minecraft: $mc_version, with Mappings: $parchment_mappings_version\n"
+println "Using Fabric: $fabric_version, Loader: $loader_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version\n"
 
 loom {
     runs {
@@ -33,12 +33,13 @@ loom {
 		}
 	}
 
-	accessWidenerPath.set(file("src/main/resources/anvilapi.accesswidener"))
+	accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))
 }
 
 repositories {
-    maven { url 'https://maven.blamejared.com' }
 	maven { url 'https://maven.parchmentmc.org' }
+	maven { url 'https://maven.blamejared.com' }
+	maven { url 'https://maven.shedaniel.me' }
 }
 
 dependencies {
@@ -46,7 +47,7 @@ dependencies {
 
 	mappings loom.layered() {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-$mc_version:$parchment_mappings_version@zip")
+		parchment("org.parchmentmc.data:parchment-$mc_version:$mappings_version@zip")
 	}
 
 	modImplementation "net.fabricmc:fabric-loader:$loader_version"
@@ -54,7 +55,14 @@ dependencies {
 
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-common-api:$jei_version"
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-fabric-api:$jei_version"
-	modRuntimeOnly "mezz.jei:jei-$mc_version-fabric:$jei_version"
+//	modImplementation "mezz.jei:jei-$mc_version-fabric:$jei_version"
+
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
+	modCompileOnlyApi "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
+	modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
+
+	modImplementation "me.shedaniel.cloth:cloth-config-fabric:$clothconfig_version"
+	modImplementation "dev.architectury:architectury-fabric:$architectury_version"
 
 	modImplementation "com.blamejared.crafttweaker:CraftTweaker-fabric-$mc_version:$crafttweaker_version"
 
@@ -88,13 +96,15 @@ publishing {
 		}
 	}
 	repositories {
-		maven {
-			url "https://hantonikdev.jfrog.io/artifactory/mods/"
+		mavenLocal()
 
-			credentials {
-				username System.getenv("REPO_USER")
-				password System.getenv("REPO_PASSWORD")
-			}
-		}
+//		maven {
+//			url "https://hantonikdev.jfrog.io/artifactory/mods/"
+//
+//			credentials {
+//				username System.getenv("REPO_USER")
+//				password System.getenv("REPO_PASSWORD")
+//			}
+//		}
 	}
 }

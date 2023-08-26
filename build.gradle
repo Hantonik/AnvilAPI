@@ -1,11 +1,5 @@
 apply from: 'buildtools/ColoredOutput.gradle'
 
-file('gradle.properties').withReader {
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
-}
-
 println "Starting build of $mod_name, Version: $mod_version"
 
 subprojects {

@@ -1,0 +1,9 @@
+{
+  "tooltip.anvilapi.shapeless": "Shapeless",
+
+  "tooltip.anvilapi.returns": "Returns",
+  "tooltip.anvilapi.consumes": "Consumes",
+
+  "tooltip.anvilapi.yes": "Yes",
+  "tooltip.anvilapi.no": "No"
+}

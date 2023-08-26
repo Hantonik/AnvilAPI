@@ -9,7 +9,7 @@ issueTrackerURL="https://github.com/Hantonik/AnvilAPI/issues"
     displayName="${mod_name}"
     displayURL="https://www.curseforge.com/minecraft/mc-mods/anvilapi"
     logoFile="logo.png"
-    updateJSONURL="https://raw.githubusercontent.com/Hantonik/AnvilAPI/1.20.1/update.json"
+    updateJSONURL="https://raw.githubusercontent.com/Hantonik/AnvilAPI/${mc_version}/update.json"
     authors="Hantonik"
     description='''AnvilAPI adds to the game the ability to create custom anvil recipes by datapacks.
 '''
