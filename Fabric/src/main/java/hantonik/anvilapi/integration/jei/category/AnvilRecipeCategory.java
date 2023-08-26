@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.Arrays;
+import java.util.List;
 
 public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(AnvilAPI.MOD_ID, "textures/gui/jei/anvil.png");
@@ -29,13 +30,10 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
     private final IDrawable background;
     private final IDrawable shapeless;
     private final IDrawable icon;
-    private final IDrawable returnSlot;
 
     public AnvilRecipeCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE, 0, 0, 152, 113);
+        this.background = helper.createDrawable(TEXTURE, 0, 0, 152, 79);
         this.shapeless = helper.createDrawable(TEXTURE, 153, 0, 18, 16);
-
-        this.returnSlot = helper.createDrawable(TEXTURE, 0, 115, 18, 32);
 
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(Blocks.ANVIL));
     }
@@ -71,33 +69,71 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
             this.shapeless.draw(graphics, 135, 62);
 
         if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
-            if (!recipe.getReturn(0).isEmpty())
-                this.returnSlot.draw(graphics, 9, 60);
+            graphics.pose().pushPose();
+            graphics.pose().translate(0, 0, 400);
 
-            if (!recipe.getReturn(1).isEmpty())
-                this.returnSlot.draw(graphics, 58, 60);
+            if (!recipe.getReturn(0).isEmpty()) {
+                if (mouseX > 9 && mouseX < 26 && mouseY > 39 && mouseY < 56) {
+                    var item = recipe.getReturn(0);
+
+                    graphics.renderItem(item, (int) mouseX + 12, (int) mouseY + 20);
+                    graphics.renderItemDecorations(font, item, (int) mouseX + 12, (int) mouseY + 20);
+                }
+            }
+
+            if (!recipe.getReturn(1).isEmpty()) {
+                if (mouseX > 58 && mouseX < 75 && mouseY > 39 && mouseY < 56) {
+                    var item = recipe.getReturn(1);
+
+                    graphics.renderItem(item, (int) mouseX + 12, (int) mouseY + 20);
+                    graphics.renderItemDecorations(font, item, (int) mouseX + 12, (int) mouseY + 20);
+                }
+            }
+
+            graphics.pose().popPose();
         }
 
         if (recipe.getExperience() > 0)
-            graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty) ? 99 : 65), (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+            graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, 65, (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+    }
+
+    @Override
+    public List<Component> getTooltipStrings(IAnvilRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
+        if (recipe.isShapeless())
+            if (mouseX > 135 && mouseX < this.shapeless.getWidth() + 135 && mouseY > 62 && mouseY < this.shapeless.getHeight() + 62)
+                return List.of(Component.translatable("tooltip.anvilapi.shapeless"));
+
+        return IRecipeCategory.super.getTooltipStrings(recipe, recipeSlotsView, mouseX, mouseY);
     }
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, IAnvilRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList())
-                .addTooltipCallback(((slotView, tooltip) -> tooltip.add(Component.literal("Consumes: ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)))));
+        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList()).addTooltipCallback(((slotView, tooltip) -> {
+            tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
 
-        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList())
-                .addTooltipCallback(((slotView, tooltip) -> tooltip.add(Component.literal("Consumes: ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)))));
+            if (!recipe.getReturn(0).isEmpty()) {
+                tooltip.add(Component.translatable("tooltip.anvilapi.returns").append(": ").withStyle(ChatFormatting.GRAY));
+                tooltip.add(Component.empty());
+                tooltip.add(Component.empty());
+            }
+        }));
+
+        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList()).addTooltipCallback(((slotView, tooltip) -> {
+            tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
+
+            if (!recipe.getReturn(1).isEmpty()) {
+                tooltip.add(Component.translatable("tooltip.anvilapi.returns").append(": ").withStyle(ChatFormatting.GRAY));
+                tooltip.add(Component.empty());
+                tooltip.add(Component.empty());
+            }
+        }));
 
         builder.addSlot(RecipeIngredientRole.OUTPUT, 117, 40).addItemStack(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
 
-        if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
-            if (!recipe.getReturn(0).isEmpty())
-                builder.addSlot(RecipeIngredientRole.OUTPUT, 10, 75).addItemStack(recipe.getReturn(0));
+        if (!recipe.getReturn(0).isEmpty())
+            builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(recipe.getReturn(0));
 
-            if (!recipe.getReturn(1).isEmpty())
-                builder.addSlot(RecipeIngredientRole.OUTPUT, 59, 75).addItemStack(recipe.getReturn(1));
-        }
+        if (!recipe.getReturn(1).isEmpty())
+            builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT).addItemStack(recipe.getReturn(1));
     }
 }
