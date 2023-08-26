@@ -36,9 +36,9 @@ public final class AnvilAPI {
     public void commonSetup(final FMLCommonSetupEvent event) {
         AnvilAPI.LOGGER.info(SETUP_MARKER, "Starting common setup...");
 
-        MinecraftForge.EVENT_BUS.register(new AARecipeHelper());
-
         MinecraftForge.EVENT_BUS.register(this);
+
+        MinecraftForge.EVENT_BUS.register(new AARecipeHelper());
 
         AnvilAPI.LOGGER.info(SETUP_MARKER, "Finished common setup!");
     }

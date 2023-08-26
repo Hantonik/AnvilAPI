@@ -33,7 +33,7 @@ loom {
 		}
 	}
 
-	accessWidenerPath.set(file("src/main/resources/anvilapi.accesswidener"))
+	accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))
 }
 
 repositories {
@@ -96,13 +96,15 @@ publishing {
 		}
 	}
 	repositories {
-		maven {
-			url "https://hantonikdev.jfrog.io/artifactory/mods/"
+		mavenLocal()
 
-			credentials {
-				username System.getenv("REPO_USER")
-				password System.getenv("REPO_PASSWORD")
-			}
-		}
+//		maven {
+//			url "https://hantonikdev.jfrog.io/artifactory/mods/"
+//
+//			credentials {
+//				username System.getenv("REPO_USER")
+//				password System.getenv("REPO_PASSWORD")
+//			}
+//		}
 	}
 }
