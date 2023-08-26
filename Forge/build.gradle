@@ -71,6 +71,7 @@ minecraft {
 
 repositories {
     maven { url 'https://maven.blamejared.com' }
+    maven { url 'https://maven.shedaniel.me' }
 }
 
 dependencies {
@@ -78,7 +79,14 @@ dependencies {
 
     compileOnly fg.deobf("mezz.jei:jei-$mc_version-common-api:$jei_version")
     compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge-api:$jei_version")
-    implementation fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
+//    implementation fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
+
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version")
+    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version")
+
+    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:$clothconfig_version")
+    implementation fg.deobf("dev.architectury:architectury-forge:$architectury_version")
 
     implementation fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-$mc_version:$crafttweaker_version")
 

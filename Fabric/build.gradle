@@ -39,6 +39,8 @@ loom {
 repositories {
     maven { url 'https://maven.blamejared.com' }
 	maven { url 'https://maven.parchmentmc.org' }
+	maven { url 'https://maven.blamejared.com' }
+	maven { url 'https://maven.shedaniel.me' }
 }
 
 dependencies {
@@ -54,7 +56,14 @@ dependencies {
 
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-common-api:$jei_version"
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-fabric-api:$jei_version"
-	modRuntimeOnly "mezz.jei:jei-$mc_version-fabric:$jei_version"
+//	modImplementation "mezz.jei:jei-$mc_version-fabric:$jei_version"
+
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
+	modCompileOnlyApi "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
+	modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
+
+	modImplementation "me.shedaniel.cloth:cloth-config-fabric:$clothconfig_version"
+	modImplementation "dev.architectury:architectury-fabric:$architectury_version"
 
 	modImplementation "com.blamejared.crafttweaker:CraftTweaker-fabric-$mc_version:$crafttweaker_version"
 

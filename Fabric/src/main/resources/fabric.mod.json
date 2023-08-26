@@ -23,6 +23,13 @@
 
 		"jei_mod_plugin": [
 			"hantonik.anvilapi.integration.jei.JeiIntegration"
+		],
+
+		"rei_client": [
+			"hantonik.anvilapi.integration.rei.ReiClientPlugin"
+		],
+		"rei_common": [
+			"hantonik.anvilapi.integration.rei.ReiCommonPlugin"
 		]
 	},
 	"depends": {
