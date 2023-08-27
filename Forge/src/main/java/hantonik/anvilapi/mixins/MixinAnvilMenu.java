@@ -73,17 +73,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             }
 
             if (recipe.isConsuming(0)) {
-                if (recipe.isUsingDurability(0) && input1.isDamageableItem()) {
-                    var damage = input1.getDamageValue() + recipe.getInputCount(0);
-
-                    input1.setDamageValue(damage);
-
-                    if (damage >= input1.getMaxDamage()) {
-                        input1.shrink(1);
-
-                        this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0)));
-                    }
-                } else
+                if (recipe.isUsingDurability(0) && input1.isDamageableItem())
+                    input1.hurtAndBreak(recipe.getInputCount(0), this.player, p -> this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0))));
+                else
                     input1.shrink(recipe.getInputCount(0));
             }
 
@@ -104,17 +96,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             }
 
             if (recipe.isConsuming(1)) {
-                if (recipe.isUsingDurability(1) && input2.isDamageableItem()) {
-                    var damage = input2.getDamageValue() + recipe.getInputCount(1);
-
-                    input2.setDamageValue(damage);
-
-                    if (damage >= input2.getMaxDamage()) {
-                        input2.shrink(1);
-
-                        this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0)));
-                    }
-                } else
+                if (recipe.isUsingDurability(1) && input2.isDamageableItem())
+                    input2.hurtAndBreak(recipe.getInputCount(1), this.player, p -> this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0))));
+                else
                     input2.shrink(recipe.getInputCount(1));
             }
 
