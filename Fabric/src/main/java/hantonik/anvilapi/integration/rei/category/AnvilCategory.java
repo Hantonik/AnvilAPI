@@ -104,6 +104,12 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
         widgets.add(Widgets.createSlot(new Point(startPoint.x + 10, startPoint.y + 40)).entries(display.getInputEntries().get(0).stream().map(stack -> {
             List<Component> components = Lists.newArrayList(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.anvilapi.no").withStyle(ChatFormatting.GREEN)));
 
+            if (recipe.isUsingDurability(0))
+                components.add(Component.translatable("tooltip.anvilapi.uses_durability").append(": ").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED)));
+
+            if (recipe.hasNbt(0))
+                components.add(Component.translatable("tooltip.anvilapi.strict_nbt").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isNbtStrict(0) ? Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.anvilapi.no").withStyle(ChatFormatting.GREEN)));
+
             if (!recipe.getReturn(0).isEmpty()) {
                 components.add(Component.translatable("tooltip.anvilapi.returns").append(": ").withStyle(ChatFormatting.GRAY));
                 components.add(Component.empty());
@@ -115,6 +121,12 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
 
         widgets.add(Widgets.createSlot(new Point(startPoint.x + 59, startPoint.y + 40)).entries(display.getInputEntries().get(1).stream().map(stack -> {
             List<Component> components = Lists.newArrayList(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.anvilapi.no").withStyle(ChatFormatting.GREEN)));
+
+            if (recipe.isUsingDurability(1))
+                components.add(Component.translatable("tooltip.anvilapi.uses_durability").append(": ").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED)));
+
+            if (recipe.hasNbt(1))
+                components.add(Component.translatable("tooltip.anvilapi.strict_nbt").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isNbtStrict(1) ? Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.anvilapi.no").withStyle(ChatFormatting.GREEN)));
 
             if (!recipe.getReturn(1).isEmpty()) {
                 components.add(Component.translatable("tooltip.anvilapi.returns").append(": ").withStyle(ChatFormatting.GRAY));

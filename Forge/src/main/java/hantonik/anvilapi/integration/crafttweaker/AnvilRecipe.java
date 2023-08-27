@@ -499,6 +499,246 @@ public final class AnvilRecipe {
     }
 
     @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack rightInput, int experience) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack rightInput, int experience, boolean shapeless) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).shapeless(shapeless));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, boolean consumeLeftInput, IItemStack rightInput, boolean consumeRightInput, int experience) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, boolean consumeLeftInput, IItemStack rightInput, boolean consumeRightInput, int experience, boolean shapeless) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, boolean consumeLeftInput, boolean useLeftItemDurability, IItemStack rightInput, boolean consumeRightInput, boolean useRightItemDurability, int experience) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, boolean consumeLeftInput, boolean useLeftItemDurability, IItemStack rightInput, boolean consumeRightInput, boolean useRightItemDurability, int experience, boolean shapeless) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack leftReturnItem, IItemStack rightInput, IItemStack rightReturnItem, int experience) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack leftReturnItem, IItemStack rightInput, IItemStack rightReturnItem, int experience, boolean shapeless) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack leftReturnItem, boolean consumeLeftInput, IItemStack rightInput, IItemStack rightReturnItem, boolean consumeRightInput, int experience) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack leftReturnItem, boolean consumeLeftInput, IItemStack rightInput, IItemStack rightReturnItem, boolean consumeRightInput, int experience, boolean shapeless) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack leftReturnItem, boolean consumeLeftInput, boolean useLeftItemDurability, IItemStack rightInput, IItemStack rightReturnItem, boolean consumeRightInput, boolean useRightItemDurability, int experience) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void addRecipe(String id, IItemStack result, IItemStack leftInput, IItemStack leftReturnItem, boolean consumeLeftInput, boolean useLeftItemDurability, IItemStack rightInput, IItemStack rightReturnItem, boolean consumeRightInput, boolean useRightItemDurability, int experience, boolean shapeless) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+            }
+
+            @Override
+            public String describe() {
+                return "Adding Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
     public static void removeAllRecipes(IItemStack result) {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
@@ -560,6 +800,33 @@ public final class AnvilRecipe {
                         .filter(r -> r.getResultItem(ServerLifecycleHooks.getCurrentServer().registryAccess()).is(result.getInternal().getItem()))
                         .filter(r -> r.getIngredients().get(0) == leftInput.asVanillaIngredient() && r.getIngredients().get(1) == rightInput.asVanillaIngredient())
                         .filter(r -> ((IAnvilRecipe) r).getCounts().get(0) == leftInputCount && ((IAnvilRecipe) r).getCounts().get(1) == rightInputCount)
+                        .map(Recipe::getId)
+                        .forEach(r -> AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL.get()).remove(r));
+            }
+
+            @Override
+            public String describe() {
+                return "Removing Anvil recipe for " + result.getCommandString() + "...";
+            }
+
+            @Override
+            public String systemName() {
+                return AnvilAPI.MOD_ID;
+            }
+        });
+    }
+
+    @ZenCodeType.Method
+    public static void removeRecipe(IItemStack result, IItemStack leftInput, IItemStack rightInput) {
+        CraftTweakerAPI.apply(new IRuntimeAction() {
+            @Override
+            public void apply() {
+                AARecipeHelper.getRecipes()
+                        .getOrDefault(AARecipeTypes.ANVIL.get(), Maps.newHashMap())
+                        .values().stream()
+                        .filter(r -> r.getResultItem(ServerLifecycleHooks.getCurrentServer().registryAccess()).is(result.getInternal().getItem()))
+                        .filter(r -> r.getIngredients().get(0).test(leftInput.getInternal()) && r.getIngredients().get(1).test(rightInput.getInternal()))
+                        .filter(r -> ((IAnvilRecipe) r).getInputNbt(0).equals(leftInput.getInternal().getOrCreateTag()) && ((IAnvilRecipe) r).getInputNbt(1).equals(rightInput.getInternal().getOrCreateTag()))
                         .map(Recipe::getId)
                         .forEach(r -> AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL.get()).remove(r));
             }

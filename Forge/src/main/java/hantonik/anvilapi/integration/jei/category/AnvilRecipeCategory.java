@@ -108,8 +108,14 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, IAnvilRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList()).addTooltipCallback(((slotView, tooltip) -> {
+        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()).addTooltipCallback(((slotView, tooltip) -> {
             tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
+
+            if (recipe.isUsingDurability(0))
+                tooltip.add(Component.translatable("tooltip.anvilapi.uses_durability").append(": ").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED)));
+
+            if (recipe.hasNbt(0))
+                tooltip.add(Component.translatable("tooltip.anvilapi.strict_nbt").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isNbtStrict(0) ? Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.anvilapi.no").withStyle(ChatFormatting.GREEN)));
 
             if (!recipe.getReturn(0).isEmpty()) {
                 tooltip.add(Component.translatable("tooltip.anvilapi.returns").append(": ").withStyle(ChatFormatting.GRAY));
@@ -118,8 +124,14 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
             }
         }));
 
-        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList()).addTooltipCallback(((slotView, tooltip) -> {
+        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList()).addTooltipCallback(((slotView, tooltip) -> {
             tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
+
+            if (recipe.isUsingDurability(1))
+                tooltip.add(Component.translatable("tooltip.anvilapi.uses_durability").append(": ").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED)));
+
+            if (recipe.hasNbt(1))
+                tooltip.add(Component.translatable("tooltip.anvilapi.strict_nbt").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isNbtStrict(1) ? Component.translatable("tooltip.anvilapi.yes").withStyle(ChatFormatting.RED) : Component.translatable("tooltip.anvilapi.no").withStyle(ChatFormatting.GREEN)));
 
             if (!recipe.getReturn(1).isEmpty()) {
                 tooltip.add(Component.translatable("tooltip.anvilapi.returns").append(": ").withStyle(ChatFormatting.GRAY));
