@@ -28,8 +28,8 @@ public final class AnvilDisplay extends BasicDisplay {
 
     public AnvilDisplay(IAnvilRecipe recipe) {
         this(List.of(
-                EntryIngredients.ofItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).toList()),
-                EntryIngredients.ofItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).toList())
+                EntryIngredients.ofItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()),
+                EntryIngredients.ofItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList())
         ), Util.make(new ArrayList<>(), outputs -> {
             outputs.add(EntryIngredients.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess())));
 
