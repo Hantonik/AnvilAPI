@@ -3,6 +3,8 @@
 
   "tooltip.anvilapi.returns": "Returns",
   "tooltip.anvilapi.consumes": "Consumes",
+  "tooltip.anvilapi.uses_durability": "Uses durability",
+  "tooltip.anvilapi.strict_nbt": "Strict NBT",
 
   "tooltip.anvilapi.yes": "Yes",
   "tooltip.anvilapi.no": "No"
