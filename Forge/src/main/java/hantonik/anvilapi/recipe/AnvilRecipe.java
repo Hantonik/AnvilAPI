@@ -19,6 +19,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -49,6 +51,8 @@ public class AnvilRecipe implements IAnvilRecipe {
     private final ItemStack result;
     private final NonNullList<Ingredient> inputs;
     private final NonNullList<ItemStack> returns;
+    private final List<CompoundTag> nbt;
+    private final List<Boolean> strictNbt;
     private final List<Boolean> consumes;
     private final List<Boolean> useDurability;
     private final List<Integer> counts;
@@ -56,21 +60,47 @@ public class AnvilRecipe implements IAnvilRecipe {
 
     private boolean shapeless;
 
+    public AnvilRecipe(ResourceLocation id, ItemStack result, List<ItemStack> leftInput, List<ItemStack> rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput.stream()), Ingredient.of(rightInput.stream())), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.get(0).getOrCreateTag(), rightInput.get(0).getOrCreateTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.get(0).getCount(), rightInput.get(0).getCount()), false, experience);
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack result, ItemStack leftInput, ItemStack rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput), Ingredient.of(rightInput)), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.getOrCreateTag(), rightInput.getOrCreateTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.getCount(), rightInput.getCount()), false, experience);
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, int leftInputCount, List<ItemStack> rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, Ingredient.of(rightInput.stream())), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), rightInput.get(0).getOrCreateTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInput.get(0).getCount()), false, experience);
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, int leftInputCount, ItemStack rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, Ingredient.of(rightInput)), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), rightInput.getOrCreateTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInput.getCount()), false, experience);
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack result, List<ItemStack> leftInput, Ingredient rightInput, int rightInputCount, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput.stream()), rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.get(0).getOrCreateTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.get(0).getCount(), rightInputCount), false, experience);
+    }
+
+    public AnvilRecipe(ResourceLocation id, ItemStack result, ItemStack leftInput, Ingredient rightInput, int rightInputCount, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput), rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.getOrCreateTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.getCount(), rightInputCount), false, experience);
+    }
+
     public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, int leftInputCount, Ingredient rightInput, int rightInputCount, int experience) {
-        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(false, false))), List.of(leftInputCount, rightInputCount), false, experience);
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInputCount), false, experience);
     }
 
     public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, Ingredient rightInput, int experience) {
-        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(false, false))), List.of(1, 1), false, experience);
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(1, 1), false, experience);
     }
 
-    protected AnvilRecipe(ResourceLocation id, ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
+    protected AnvilRecipe(ResourceLocation id, ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<CompoundTag> nbt, List<Boolean> strictNbt, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
         this.serializerName = new ResourceLocation("anvil");
 
         this.id = id;
         this.result = result;
         this.inputs = inputs;
         this.returns = returns;
+        this.nbt = nbt;
+        this.strictNbt = strictNbt;
         this.consumes = consumes;
         this.useDurability = useDurability;
         this.counts = counts;
@@ -118,6 +148,13 @@ public class AnvilRecipe implements IAnvilRecipe {
     @CanIgnoreReturnValue
     public AnvilRecipe setReturnItem(int inputId, ItemStack returnItem) {
         this.returns.set(inputId, returnItem);
+
+        return this;
+    }
+
+    @CanIgnoreReturnValue
+    public AnvilRecipe strictNbt(int inputId) {
+        this.strictNbt.set(inputId, this.hasNbt(inputId));
 
         return this;
     }
@@ -178,6 +215,31 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
+    public List<CompoundTag> getAllNbt() {
+        return this.nbt;
+    }
+
+    @Override
+    public CompoundTag getInputNbt(int inputId) {
+        return this.nbt.get(inputId);
+    }
+
+    @Override
+    public boolean hasNbt(int inputId) {
+        return !this.nbt.get(inputId).isEmpty();
+    }
+
+    @Override
+    public List<Boolean> getStrictNbt() {
+        return this.strictNbt;
+    }
+
+    @Override
+    public boolean isNbtStrict(int inputId) {
+        return this.hasNbt(inputId) && this.strictNbt.get(inputId);
+    }
+
+    @Override
     public List<Boolean> getConsumes() {
         return this.consumes;
     }
@@ -193,7 +255,7 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public ItemStack assemble(Container p_44001_, RegistryAccess access) {
+    public ItemStack assemble(Container container, RegistryAccess access) {
         return this.getResultItem(access).copy();
     }
 
@@ -217,6 +279,7 @@ public class AnvilRecipe implements IAnvilRecipe {
 
                 var ingredient = this.inputs.get(ingredientId);
                 var ingredientCount = this.counts.get(ingredientId);
+                var ingredientNbt = this.nbt.get(ingredientId);
 
                 for (var inputId = 0; inputId < inputs.size(); inputId++) {
                     var input = inputs.get(inputId);
@@ -235,6 +298,13 @@ public class AnvilRecipe implements IAnvilRecipe {
                     if (input.getCount() < ingredientCount)
                         continue;
 
+                    if (this.isNbtStrict(ingredientId)) {
+                        if (!ingredientNbt.equals(input.getOrCreateTag()))
+                            continue;
+                    } else
+                        if (!NbtUtils.compareNbt(ingredientNbt, input.getOrCreateTag(), true))
+                            continue;
+
                     if (ingredient.test(input)) {
                         flag = true;
 
@@ -250,7 +320,7 @@ public class AnvilRecipe implements IAnvilRecipe {
 
             return true;
         } else
-            return this.getInput(0).test(inputs.get(0)) && this.getInputCount(0) <= inputs.get(0).getCount() && (!this.isUsingDurability(0) || inputs.get(0).isDamageableItem()) && this.getInput(1).test(inputs.get(1)) && this.getInputCount(1) <= inputs.get(1).getCount() && (!this.isUsingDurability(1) || inputs.get(1).isDamageableItem());
+            return this.getInput(0).test(inputs.get(0)) && this.getInputCount(0) <= inputs.get(0).getCount() && (this.isNbtStrict(0) ? this.getInputNbt(0).equals(inputs.get(0).getOrCreateTag()) : NbtUtils.compareNbt(this.getInputNbt(0), inputs.get(0).getOrCreateTag(), true)) && (!this.isUsingDurability(0) || inputs.get(0).isDamageableItem()) && this.getInput(1).test(inputs.get(1)) && this.getInputCount(1) <= inputs.get(1).getCount() && (this.isNbtStrict(1) ? this.getInputNbt(1).equals(inputs.get(1).getOrCreateTag()) : NbtUtils.compareNbt(this.getInputNbt(1), inputs.get(1).getOrCreateTag(), true)) && (!this.isUsingDurability(1) || inputs.get(1).isDamageableItem());
     }
 
     @Override
@@ -259,12 +329,12 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<IAnvilRecipe> getType() {
         return AARecipeTypes.ANVIL.get();
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<IAnvilRecipe> getSerializer() {
         return AARecipeSerializers.ANVIL.get();
     }
 
@@ -290,7 +360,10 @@ public class AnvilRecipe implements IAnvilRecipe {
             var result = CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true, false);
 
             NonNullList<Ingredient> inputs = NonNullList.create();
+
             NonNullList<ItemStack> returns = NonNullList.create();
+            List<CompoundTag> nbt = Lists.newArrayList();
+            List<Boolean> strictNbt = Lists.newArrayList();
             List<Boolean> consumes = Lists.newArrayList();
             List<Boolean> useDurability = Lists.newArrayList();
             List<Integer> counts = Lists.newArrayList();
@@ -299,9 +372,11 @@ public class AnvilRecipe implements IAnvilRecipe {
                 inputs.add(Ingredient.fromJson(inputElement));
 
                 returns.add(inputElement.getAsJsonObject().has("return") ? CraftingHelper.getItemStack(GsonHelper.getAsJsonObject(inputElement.getAsJsonObject(), "return"), true, false) : ItemStack.EMPTY);
-                counts.add(GsonHelper.getAsInt(inputElement.getAsJsonObject(), "count", 1));
+                nbt.add(inputElement.getAsJsonObject().has("nbt") ? CraftingHelper.getNBT(inputElement.getAsJsonObject().get("nbt")) : new CompoundTag());
+                strictNbt.add(GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "strictNbt", false));
                 consumes.add(GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "consume", true));
                 useDurability.add(GsonHelper.getAsBoolean(inputElement.getAsJsonObject(), "useDurability", false));
+                counts.add(GsonHelper.getAsInt(inputElement.getAsJsonObject(), "count", 1));
             }
 
             var shapeless = false;
@@ -311,7 +386,7 @@ public class AnvilRecipe implements IAnvilRecipe {
 
             var experience = GsonHelper.getAsInt(json, "experience", 0);
 
-            return new AnvilRecipe(id, result, inputs, returns, consumes, useDurability, counts, shapeless, experience);
+            return new AnvilRecipe(id, result, inputs, returns, nbt, strictNbt, consumes, useDurability, counts, shapeless, experience);
         }
 
         @Nullable
@@ -330,6 +405,18 @@ public class AnvilRecipe implements IAnvilRecipe {
 
             for (var returnId = 0; returnId < returnsSize; returnId++)
                 returns.add(buffer.readItem());
+
+            var nbtSize = buffer.readInt();
+            List<CompoundTag> nbt = Lists.newArrayList();
+
+            for (var nbtId = 0; nbtId < nbtSize; nbtId++)
+                nbt.add(buffer.readNbt());
+
+            var strictNbtSize = buffer.readInt();
+            List<Boolean> strictNbt = Lists.newArrayList();
+
+            for (var strictNbtId = 0; strictNbtId < strictNbtSize; strictNbtId++)
+                strictNbt.add(buffer.readBoolean());
 
             var consumesSize = buffer.readInt();
             List<Boolean> consumes = Lists.newArrayList();
@@ -352,7 +439,7 @@ public class AnvilRecipe implements IAnvilRecipe {
             var shapeless = buffer.readBoolean();
             var experience = buffer.readInt();
 
-            return new AnvilRecipe(id, result, inputs, returns, consumes, useDurability, counts, shapeless, experience);
+            return new AnvilRecipe(id, result, inputs, returns, nbt, strictNbt, consumes, useDurability, counts, shapeless, experience);
         }
 
         @Override
@@ -369,7 +456,17 @@ public class AnvilRecipe implements IAnvilRecipe {
             for (var ret : recipe.getReturns())
                 buffer.writeItem(ret);
 
-            buffer.writeInt(recipe.getCounts().size());
+            buffer.writeInt(recipe.getAllNbt().size());
+
+            for (var nbt : recipe.getAllNbt())
+                buffer.writeNbt(nbt);
+
+            buffer.writeInt(recipe.getStrictNbt().size());
+
+            for (var strictNbt : recipe.getStrictNbt())
+                buffer.writeBoolean(strictNbt);
+
+            buffer.writeInt(recipe.getConsumes().size());
 
             for (var consume : recipe.getConsumes())
                 buffer.writeBoolean(consume);
@@ -379,10 +476,10 @@ public class AnvilRecipe implements IAnvilRecipe {
             for (var useDurability : recipe.getUseDurability())
                 buffer.writeBoolean(useDurability);
 
+            buffer.writeInt(recipe.getCounts().size());
+
             for (var count : recipe.getCounts())
                 buffer.writeInt(count);
-
-            buffer.writeInt(recipe.getConsumes().size());
 
             buffer.writeBoolean(recipe.isShapeless());
             buffer.writeInt(recipe.getExperience());
@@ -428,6 +525,10 @@ public class AnvilRecipe implements IAnvilRecipe {
 
                 if (counts.get(inputId) != 1)
                     inputJson.addProperty("count", counts.get(inputId));
+                if (!nbt.get(inputId).isEmpty())
+                    inputJson.addProperty("nbt", nbt.get(inputId).toString());
+                if (strictNbt.get(inputId))
+                    inputJson.addProperty("strictNbt", strictNbt.get(inputId));
                 if (!consumes.get(inputId))
                     inputJson.addProperty("consume", consumes.get(inputId));
                 if (useDurability.get(inputId))

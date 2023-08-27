@@ -1,6 +1,7 @@
 package hantonik.anvilapi.api.recipe;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -29,6 +30,16 @@ public interface IAnvilRecipe extends Recipe<Container> {
     List<Boolean> getUseDurability();
 
     boolean isUsingDurability(int inputId);
+
+    List<CompoundTag> getAllNbt();
+
+    CompoundTag getInputNbt(int inputId);
+
+    boolean hasNbt(int inputId);
+
+    List<Boolean> getStrictNbt();
+
+    boolean isNbtStrict(int inputId);
 
     boolean isShapeless();
 
