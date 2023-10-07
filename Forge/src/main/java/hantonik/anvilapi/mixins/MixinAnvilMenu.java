@@ -48,6 +48,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     @Inject(at = @At("HEAD"), method = "onTake", cancellable = true)
     protected void onTake(Player player, ItemStack stack, CallbackInfo callback) {
+        callback.cancel();
+
         if (!player.getAbilities().instabuild)
             player.giveExperienceLevels(-this.cost.get());
 
@@ -150,8 +152,6 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             } else
                 level.levelEvent(1030, pos, 0);
         });
-        
-        callback.cancel();
     }
 
     @Inject(at = @At("HEAD"), method = "createResult", cancellable = true)
