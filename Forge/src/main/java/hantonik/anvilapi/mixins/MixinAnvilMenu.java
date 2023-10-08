@@ -1,6 +1,7 @@
 package hantonik.anvilapi.mixins;
 
 import hantonik.anvilapi.init.AARecipeTypes;
+import hantonik.anvilapi.utils.AADisabledRecipes;
 import hantonik.anvilapi.utils.AAItemHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
@@ -9,6 +10,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
@@ -182,6 +185,36 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             this.broadcastChanges();
 
             callback.cancel();
+        } else {
+            var baseItem = this.inputSlots.getItem(0);
+            var secondItem = this.inputSlots.getItem(1);
+
+            if (baseItem.isDamageableItem() && baseItem.getItem().isValidRepairItem(baseItem, secondItem)) {
+                if (AADisabledRecipes.isRepairDisabled(baseItem, secondItem) || AADisabledRecipes.isRepairItemDisabled(secondItem)) {
+                    callback.cancel();
+
+                    this.resultSlots.setItem(0, ItemStack.EMPTY);
+                    this.broadcastChanges();
+                }
+            }
+
+            if (secondItem.getItem() == Items.ENCHANTED_BOOK) {
+                if (EnchantmentHelper.getEnchantments(secondItem).entrySet().stream().anyMatch(entry -> AADisabledRecipes.isEnchantmentDisabled(baseItem, entry.getKey(), entry.getValue()))) {
+                    callback.cancel();
+
+                    this.resultSlots.setItem(0, ItemStack.EMPTY);
+                    this.broadcastChanges();
+                }
+            }
+
+            if (baseItem.getItem() == Items.ENCHANTED_BOOK) {
+                if (EnchantmentHelper.getEnchantments(baseItem).entrySet().stream().anyMatch(entry -> AADisabledRecipes.isEnchantmentDisabled(null, entry.getKey(), entry.getValue()))) {
+                    callback.cancel();
+
+                    this.resultSlots.setItem(0, ItemStack.EMPTY);
+                    this.broadcastChanges();
+                }
+            }
         }
     }
 }
