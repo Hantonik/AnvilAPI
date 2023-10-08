@@ -2,6 +2,7 @@ package hantonik.anvilapi;
 
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
+import hantonik.anvilapi.utils.AADisabledRecipes;
 import hantonik.anvilapi.utils.AARecipeHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,6 +40,7 @@ public final class AnvilAPI {
         MinecraftForge.EVENT_BUS.register(this);
 
         MinecraftForge.EVENT_BUS.register(new AARecipeHelper());
+        MinecraftForge.EVENT_BUS.register(new AADisabledRecipes());
 
         AnvilAPI.LOGGER.info(SETUP_MARKER, "Finished common setup!");
     }
