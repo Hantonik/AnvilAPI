@@ -2,7 +2,7 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
 
   "promos": {
-    "1.20.1-latest": "4.1.2.1",
+    "1.20.1-latest": "4.1.3.0",
     "1.20.1-recommended": "4.1.2.0",
 
     "1.20-latest": "3.0.0.0",
@@ -17,6 +17,7 @@
   },
 
   "1.20.1": {
+    "4.1.3.0": "Added option to disable repair and enchantment recipes",
     "4.1.2.1": "Fixed non-crafted items change state",
     "4.1.2.0": "Added ability to set NBT Tags for inputs. Improved JEI Integration",
     "4.1.1.0": "Added REI Integration. Improved JEI Integration. Using ParchmentMC mappings. Compatible with NeoForged",
