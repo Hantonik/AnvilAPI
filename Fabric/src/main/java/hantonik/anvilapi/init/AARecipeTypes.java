@@ -1,6 +1,7 @@
 package hantonik.anvilapi.init;
 
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
+import hantonik.anvilapi.api.recipe.IAnvilRepairRecipe;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.Registry;
@@ -15,8 +16,14 @@ public final class AARecipeTypes {
             return "anvil";
         }
     };
+    public static final RecipeType<IAnvilRepairRecipe> ANVIL_REPAIR = new RecipeType<>(){
+        public String toString() {
+            return "anvil_repair";
+        }
+    };
 
     public static void onInit() {
         Registry.register(BuiltInRegistries.RECIPE_TYPE, new ResourceLocation("anvil"), ANVIL);
+        Registry.register(BuiltInRegistries.RECIPE_TYPE, new ResourceLocation("anvil_repair"), ANVIL_REPAIR);
     }
 }
