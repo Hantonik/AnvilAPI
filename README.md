@@ -43,8 +43,8 @@ Here is an example anvil recipe file:
 
 ## Contribution
 
-**Found a bug?** Report it [here](https://github.com/Hantonik/AnvilAPI/issues/new?labels=bug&amp;template=bug_report.md "Enter all the necessary information!"), and I'll try to fix it!\
-**Have an idea for a new feature?** Tell me more about it [here](https://github.com/Hantonik/AnvilAPI/issues/new?labels=enhancement&amp;template=feature_request.md "I'm open to suggestions!")!
+**Found a bug?** Report it [here](https://github.com/Hantonik/AnvilAPI/issues/new?labels=bug&amp;template=bug_report.yml "Enter all the necessary information!"), and I'll try to fix it!\
+**Have an idea for a new feature?** Tell me more about it [here](https://github.com/Hantonik/AnvilAPI/issues/new?labels=enhancement&amp;template=feature_request.yml "I'm open to suggestions!")!
 
 ## Code
 
