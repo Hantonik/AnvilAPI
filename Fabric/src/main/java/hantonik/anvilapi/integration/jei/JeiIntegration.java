@@ -7,13 +7,19 @@ import hantonik.anvilapi.utils.AARecipeHelper;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
+import mezz.jei.api.recipe.vanilla.IJeiAnvilRecipe;
 import mezz.jei.api.registration.*;
+import mezz.jei.library.plugins.vanilla.anvil.AnvilRecipe;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 @JeiPlugin
 public final class JeiIntegration implements IModPlugin {
@@ -49,5 +55,10 @@ public final class JeiIntegration implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(AnvilScreen.class, 102, 48, 22, 15, AnvilRecipeCategory.RECIPE_TYPE, RecipeTypes.ANVIL);
+    }
+
+    @Override
+    public void registerRuntime(IRuntimeRegistration registration) {
+        registration.getRecipeManager().addRecipes(RecipeTypes.ANVIL, AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR).values().stream().map(recipe -> (IJeiAnvilRecipe) new AnvilRecipe(Stream.of(new ItemStack(recipe.getBaseItem())).peek(input -> input.setDamageValue(input.getMaxDamage())).toList(), Arrays.asList(recipe.getRepairItem().getItems()), Stream.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess())).peek(input -> input.setDamageValue(input.getMaxDamage() * 3 / 4)).toList())).toList());
     }
 }
