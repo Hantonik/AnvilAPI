@@ -1,5 +1,6 @@
 plugins {
     id 'net.darkhax.curseforgegradle' version '1.0.+' apply false
+    id 'com.modrinth.minotaur' version '2.+' apply false
 }
 
 apply from: 'buildtools/ColoredOutput.gradle'
@@ -50,4 +51,5 @@ subprojects {
 
 task publishMod {
     dependsOn(':Forge:publishCurseForge').finalizedBy(':Fabric:publishCurseForge')
+    dependsOn(':Forge:modrinth').finalizedBy(':Fabric:modrinth')
 }

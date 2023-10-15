@@ -1,3 +1,5 @@
+import com.modrinth.minotaur.dependencies.DependencyType
+import com.modrinth.minotaur.dependencies.ModDependency
 import net.darkhax.curseforgegradle.Constants as CFConstants
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
@@ -12,6 +14,7 @@ plugins {
 }
 
 apply plugin: 'net.darkhax.curseforgegradle'
+apply plugin: 'com.modrinth.minotaur'
 
 base {
     archivesName = "$mod_name-$mc_version-forge"
@@ -135,6 +138,35 @@ task publishCurseForge(type: TaskPublishCurseForge) {
     modFile.changelogType = CFConstants.CHANGELOG_HTML
     modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-forge-$version", '&#x60;': '`' ])
 }
+
+modrinth {
+    token = System.getenv('MODRINTH_TOKEN')
+
+    projectId = mod_id
+
+    versionName = "$archivesBaseName-$version"
+    versionNumber = version
+    versionType = 'release'
+
+    gameVersions = [ mc_version ]
+    loaders = [ 'forge', 'neoforge' ]
+
+    dependencies = [
+            new ModDependency('Xg35A4rS', DependencyType.OPTIONAL),
+            new ModDependency('nfn13YXA', DependencyType.OPTIONAL),
+            new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
+    ]
+
+    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-forge-$version", '&#x60;': '`' ]) }
+
+    uploadFile = tasks.jar
+    additionalFiles = [ tasks.sourcesJar ]
+}
+
+tasks.modrinth.dependsOn(tasks.jar)
+tasks.modrinth.dependsOn(tasks.sourcesJar)
+
+tasks.modrinth.dependsOn(':Changelog:makeMarkdownChangelog')
 
 publishing {
     publications {
