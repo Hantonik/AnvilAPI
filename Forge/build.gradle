@@ -174,19 +174,11 @@ publishing {
             artifact jar
             artifact sourcesJar
 
-            artifactId "$archivesBaseName"
+            artifactId archivesBaseName
         }
     }
+
     repositories {
         mavenLocal()
-
-//        maven {
-//            url "https://hantonikdev.jfrog.io/artifactory/mods/"
-//
-//            credentials {
-//                username System.getenv("REPO_USER")
-//                password System.getenv("REPO_PASSWORD")
-//            }
-//        }
     }
 }
