@@ -1,3 +1,6 @@
+import net.darkhax.curseforgegradle.Constants as CFConstants
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
 plugins {
     id 'net.neoforged.gradle' version '[6.0.18,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
@@ -7,6 +10,8 @@ plugins {
     id 'idea'
     id 'maven-publish'
 }
+
+apply plugin: 'net.darkhax.curseforgegradle'
 
 base {
     archivesName = "$mod_name-$mc_version-forge"
@@ -109,6 +114,26 @@ java {
 artifacts {
     archives jar
     archives sourcesJar
+}
+
+project.evaluationDependsOn(':Changelog')
+
+task publishCurseForge(type: TaskPublishCurseForge) {
+    dependsOn(tasks.jar)
+    dependsOn(':Changelog:makeHtmlChangelog')
+
+    apiToken = System.getenv('CURSEFORGE_TOKEN')
+
+    var modFile = upload('634377', tasks.jar.archiveFile)
+    modFile.displayName = "$archivesBaseName-$version"
+    modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
+    modFile.addGameVersion mc_version
+    modFile.addModLoader('Forge', 'NeoForge')
+    modFile.addJavaVersion 'Java 17'
+    modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
+
+    modFile.changelogType = CFConstants.CHANGELOG_HTML
+    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-forge-$version", '&#x60;': '`' ])
 }
 
 publishing {
