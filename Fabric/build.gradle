@@ -82,14 +82,14 @@ java {
 }
 
 artifacts {
-	archives jar
+	archives remapJar
 	archives sourcesJar
 }
 
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifact jar
+			artifact remapJar
 			artifact sourcesJar
 
 			artifactId "$archivesBaseName"
