@@ -9,8 +9,8 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -189,7 +189,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             var baseItem = this.inputSlots.getItem(0);
             var secondItem = this.inputSlots.getItem(1);
 
-            if (secondItem.getItem() == Items.ENCHANTED_BOOK) {
+            if (secondItem.getItem() instanceof EnchantedBookItem) {
                 if (EnchantmentHelper.getEnchantments(secondItem).entrySet().stream().anyMatch(entry -> AADisabledRecipes.isEnchantmentDisabled(baseItem, entry.getKey(), entry.getValue()))) {
                     callback.cancel();
 
@@ -198,7 +198,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                 }
             }
 
-            if (baseItem.getItem() == Items.ENCHANTED_BOOK) {
+            if (baseItem.getItem() instanceof EnchantedBookItem) {
                 if (EnchantmentHelper.getEnchantments(baseItem).entrySet().stream().anyMatch(entry -> AADisabledRecipes.isEnchantmentDisabled(null, entry.getKey(), entry.getValue()))) {
                     callback.cancel();
 
