@@ -42,3 +42,5 @@ replay_*.log
 /Fabric/src/test/
 /Forge/run/
 /Fabric/run/
+/Changelog/changelog.html
+/Changelog/changelog.md
