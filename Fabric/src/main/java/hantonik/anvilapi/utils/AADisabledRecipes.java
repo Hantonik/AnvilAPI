@@ -85,8 +85,6 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
         ENCHANTMENTS.addAll(ENCHANTMENTS_INTERNAL);
         REPAIR_ITEMS.addAll(REPAIR_ITEMS_INTERNAL);
 
-
-
         var dir = Paths.get(PATH.toString(), AnvilAPI.MOD_ID);
 
         try {
