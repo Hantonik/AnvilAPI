@@ -5,6 +5,7 @@
   "refmap": "anvilapi.refmap.json",
   "mixins": [
     "MixinItem",
+    "MixinJEIVanillaPlugin",
 
     "accessors.AccessorJEIRecipeManager"
   ],
