@@ -8,7 +8,7 @@ task makeHtmlChangelog(type: GitChangelogTask) {
     fromRepo = projectDir.absolutePath.toString()
     file = file('changelog.html')
 
-    fromCommit = "git rev-list ${'git describe --tags'.execute().text.trim()}..HEAD --reverse".execute().text.split('\n').first().trim()
+    fromCommit = "git rev-list ${'git describe --tags --abbrev=0'.execute().text.trim()}..HEAD --reverse".execute().text.split('\n').first().trim()
     toRef = 'HEAD'
 
     templateContent = file('templates/changelog-html.mustache').getText()
@@ -18,7 +18,7 @@ task makeMarkdownChangelog(type: GitChangelogTask) {
     fromRepo = projectDir.absolutePath.toString()
     file = file('changelog.md')
 
-    fromCommit = "git rev-list ${'git describe --tags'.execute().text.trim()}..HEAD --reverse".execute().text.split('\n').first().trim()
+    fromCommit = "git rev-list ${'git describe --tags --abbrev=0'.execute().text.trim()}..HEAD --reverse".execute().text.split('\n').first().trim()
     toRef = 'HEAD'
 
     templateContent = file('templates/changelog-markdown.mustache').getText()

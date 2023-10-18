@@ -135,7 +135,7 @@ modrinth {
 			new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
 	]
 
-	changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-fabric-$version" ], '&#x60;': '`') }
+	changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-fabric-$version", '&#x60;': '`' ]) }
 
 	uploadFile = tasks.remapJar
 	additionalFiles = [ tasks.sourcesJar ]
