@@ -78,10 +78,6 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:$lombok_version"
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
-}
-
 java {
 	withSourcesJar()
 
@@ -152,19 +148,11 @@ publishing {
 			artifact remapJar
 			artifact sourcesJar
 
-			artifactId "$archivesBaseName"
+			artifactId archivesBaseName
 		}
 	}
+
 	repositories {
 		mavenLocal()
-
-//		maven {
-//			url "https://hantonikdev.jfrog.io/artifactory/mods/"
-//
-//			credentials {
-//				username System.getenv("REPO_USER")
-//				password System.getenv("REPO_PASSWORD")
-//			}
-//		}
 	}
 }

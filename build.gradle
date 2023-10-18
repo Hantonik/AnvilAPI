@@ -25,7 +25,7 @@ subprojects {
         inputs.properties replaceProperties
 	    replaceProperties.put 'project', project
 
-	    filesMatching(List.of("META-INF/mods.toml", "fabric.mod.json")) {
+	    filesMatching([ 'META-INF/mods.toml', 'fabric.mod.json' ]) {
 	    	expand replaceProperties
 	    }
     }
@@ -34,11 +34,11 @@ subprojects {
         manifest {
             attributes([
                     "Specification-Title": mod_id,
-                    "Specification-Vendor": "Hantonik",
-                    "Specification-Version": "1",
+                    "Specification-Vendor": 'Hantonik',
+                    "Specification-Version": '1',
                     "Implementation-Title": project.name,
                     "Implementation-Version": project.jar.archiveVersion,
-                    "Implementation-Vendor": "Hantonik",
+                    "Implementation-Vendor": 'Hantonik',
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
             ])
         }
