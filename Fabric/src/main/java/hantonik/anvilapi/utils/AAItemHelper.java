@@ -4,10 +4,19 @@ import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AAItemHelper {
+    public static JsonObject serialize(Item item) {
+        var json = new JsonObject();
+
+        json.addProperty("item", BuiltInRegistries.ITEM.getKey(item).toString());
+
+        return json;
+    }
+
     public static JsonObject serialize(ItemStack stack) {
         var json = new JsonObject();
 

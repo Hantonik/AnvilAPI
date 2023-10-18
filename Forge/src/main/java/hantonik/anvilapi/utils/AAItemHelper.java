@@ -3,6 +3,7 @@ package hantonik.anvilapi.utils;
 import com.google.gson.JsonObject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -10,6 +11,14 @@ import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AAItemHelper {
+    public static JsonObject serialize(Item item) {
+        var json = new JsonObject();
+
+        json.addProperty("item", Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(item)).toString());
+
+        return json;
+    }
+
     public static JsonObject serialize(ItemStack stack) {
         var json = new JsonObject();
 

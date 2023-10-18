@@ -3,7 +3,10 @@
   "package": "hantonik.anvilapi.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinReloadableServerResources"
+    "MixinItem",
+    "MixinReloadableServerResources",
+
+    "accessors.AccessorJEIRecipeManager"
   ],
   "client": [
     "MixinAnvilMenu",

@@ -85,8 +85,6 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
         ENCHANTMENTS.addAll(ENCHANTMENTS_INTERNAL);
         REPAIR_ITEMS.addAll(REPAIR_ITEMS_INTERNAL);
 
-
-
         var dir = Paths.get(PATH.toString(), AnvilAPI.MOD_ID);
 
         try {
@@ -98,6 +96,8 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 var writer = new FileWriter(file);
 
                 var template = new JsonObject();
+                template.addProperty("enable", true);
+
                 template.add("repair", new JsonArray());
                 template.add("repairItems", new JsonArray());
                 template.add("enchantments", new JsonArray());
@@ -109,6 +109,9 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
             }
 
             var json = JsonParser.parseReader(new InputStreamReader(new FileInputStream(file))).getAsJsonObject();
+
+            if (!GsonHelper.getAsBoolean(json, "enable", true))
+                return;
 
             for (var repairJson : json.get("repair").getAsJsonArray()) {
                 Ingredient baseItem;
