@@ -1,6 +1,7 @@
 package hantonik.anvilapi.mixins;
 
 import hantonik.anvilapi.init.AARecipeTypes;
+import hantonik.anvilapi.utils.AADisabledRecipes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.flag.FeatureElement;
@@ -16,6 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinItem implements FeatureElement, ItemLike {
     @Inject(at = @At("RETURN"), method = "isValidRepairItem", cancellable = true)
     public void isValdRepairItem(ItemStack stack, ItemStack repairCandidate, CallbackInfoReturnable<Boolean> callback) {
+        if (AADisabledRecipes.isRepairItemDisabled(repairCandidate) || AADisabledRecipes.isRepairDisabled(stack, repairCandidate))
+            callback.setReturnValue(false);
+
         var level = Minecraft.getInstance().level;
 
         if (level != null) {
