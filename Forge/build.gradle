@@ -4,7 +4,7 @@ import net.darkhax.curseforgegradle.Constants as CFConstants
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
-    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
+    id 'net.minecraftforge.gradle' version '[6.0.14,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'io.freefair.lombok' version '6.6.+'
@@ -28,7 +28,7 @@ mixin {
     config "${mod_id}.mixins.json"
 }
 
-println "Using Forge (NeoForged): $forge_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
+println "Using Forge: $forge_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
 
 minecraft {
     mappings channel: mappings_channel, version: mappings_version
@@ -121,7 +121,7 @@ task publishCurseForge(type: TaskPublishCurseForge) {
     modFile.displayName = "$archivesBaseName-$version"
     modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
     modFile.addGameVersion mc_version
-    modFile.addModLoader('Forge', 'NeoForge')
+    modFile.addModLoader('Forge')
     modFile.addJavaVersion 'Java 17'
     modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
 
@@ -139,7 +139,7 @@ modrinth {
     versionType = 'release'
 
     gameVersions = [ mc_version ]
-    loaders = [ 'forge', 'neoforge' ]
+    loaders = [ 'forge' ]
 
     dependencies = [
             new ModDependency('Xg35A4rS', DependencyType.OPTIONAL),
