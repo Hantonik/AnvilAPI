@@ -154,6 +154,7 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
             var json = new JsonObject();
 
             json.addProperty("type", serializerName.toString());
+
             this.serializeRecipeData(json);
 
             return json;

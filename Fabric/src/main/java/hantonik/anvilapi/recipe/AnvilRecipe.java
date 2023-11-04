@@ -490,6 +490,7 @@ public class AnvilRecipe implements IAnvilRecipe {
             var json = new JsonObject();
 
             json.addProperty("type", serializerName.toString());
+
             this.serializeRecipeData(json);
 
             return json;

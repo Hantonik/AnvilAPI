@@ -2,11 +2,11 @@ package hantonik.anvilapi.utils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import hantonik.anvilapi.event.callback.AddServerReloadListenerCallback;
-import hantonik.anvilapi.event.callback.RecipeUpdatedCallback;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -14,13 +14,17 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.Map;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AARecipeHelper {
+public final class AARecipeHelper implements ServerLifecycleEvents.StartDataPackReload, ServerLifecycleEvents.SyncDataPackContents {
     private static RecipeManager MANAGER;
 
-    public static void init() {
-        AddServerReloadListenerCallback.EVENT.register((resources, access) -> MANAGER = resources.getRecipeManager());
-        RecipeUpdatedCallback.EVENT.register(manager -> MANAGER = manager);
+    @Override
+    public void startDataPackReload(MinecraftServer server, CloseableResourceManager manager) {
+        MANAGER = server.getRecipeManager();
+    }
+
+    @Override
+    public void onSyncDataPackContents(ServerPlayer player, boolean joined) {
+        MANAGER = player.level().getRecipeManager();
     }
 
     public static RecipeManager getRecipeManager() {

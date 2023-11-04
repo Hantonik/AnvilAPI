@@ -38,12 +38,11 @@ minecraft {
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
-        client {
+        configureEach {
             workingDirectory project.file('run')
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', "$mod_id"
 
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
@@ -57,23 +56,14 @@ minecraft {
             }
         }
 
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
         server {
-            workingDirectory project.file('run')
+            property 'forge.enabledGameTestNamespaces', mod_id
 
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', "$mod_id"
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
-
-            ideaModule "${rootProject.name}.${project.name}.main"
-
-            mods {
-                anvilapi {
-                    source sourceSets.main
-                }
-            }
+            args '--nogui'
         }
     }
 }

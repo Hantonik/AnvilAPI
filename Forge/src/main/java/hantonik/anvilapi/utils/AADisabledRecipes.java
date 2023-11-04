@@ -171,7 +171,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 REPAIR_ITEMS.add(repairItem);
             }
         } catch (IOException e) {
-            AnvilAPI.LOGGER.error(e);
+            AnvilAPI.LOGGER.error("Could no load disabled repair recipes.", e);
         }
     }
 

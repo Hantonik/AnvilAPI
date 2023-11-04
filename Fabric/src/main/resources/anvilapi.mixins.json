@@ -5,14 +5,12 @@
   "mixins": [
     "MixinItem",
     "MixinJEIVanillaPlugin",
-    "MixinReloadableServerResources",
 
     "accessors.AccessorJEIRecipeManager"
   ],
   "client": [
     "MixinAnvilMenu",
-    "MixinAnvilScreen",
-    "MixinClientPacketListener"
+    "MixinAnvilScreen"
   ],
   "minVersion": "0.8"
 }

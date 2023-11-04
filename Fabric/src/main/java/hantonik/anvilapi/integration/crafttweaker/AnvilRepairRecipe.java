@@ -90,7 +90,7 @@ public final class AnvilRepairRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL_REPAIR).remove(new ResourceLocation(AnvilAPI.MOD_ID, id));
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR).remove(new ResourceLocation(AnvilAPI.MOD_ID, id));
             }
 
             @Override
@@ -110,7 +110,7 @@ public final class AnvilRepairRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL_REPAIR).remove(new ResourceLocation(modId, id));
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR).remove(new ResourceLocation(modId, id));
             }
 
             @Override

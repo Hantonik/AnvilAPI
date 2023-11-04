@@ -5,9 +5,7 @@ import com.blamejared.crafttweaker.api.action.base.IRuntimeAction;
 import com.blamejared.crafttweaker.api.annotation.ZenRegister;
 import com.blamejared.crafttweaker.api.ingredient.IIngredient;
 import com.blamejared.crafttweaker.api.item.IItemStack;
-import com.google.common.collect.Maps;
 import hantonik.anvilapi.AnvilAPI;
-import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.init.AARecipeTypes;
 import hantonik.anvilapi.utils.AARecipeHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -743,8 +741,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes()
-                        .getOrDefault(AARecipeTypes.ANVIL.get(), Maps.newHashMap())
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL.get())
                         .values().stream()
                         .filter(r -> r.getResultItem(ServerLifecycleHooks.getCurrentServer().registryAccess()).is(result.getInternal().getItem()))
                         .map(Recipe::getId)
@@ -768,8 +765,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes()
-                        .getOrDefault(AARecipeTypes.ANVIL.get(), Maps.newHashMap())
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL.get())
                         .values().stream()
                         .filter(r -> r.getResultItem(ServerLifecycleHooks.getCurrentServer().registryAccess()).is(result.getInternal().getItem()))
                         .filter(r -> r.getIngredients().get(0) == leftInput.asVanillaIngredient() && r.getIngredients().get(1) == rightInput.asVanillaIngredient())
@@ -794,8 +790,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes()
-                        .getOrDefault(AARecipeTypes.ANVIL.get(), Maps.newHashMap())
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL.get())
                         .values().stream()
                         .filter(r -> r.getResultItem(ServerLifecycleHooks.getCurrentServer().registryAccess()).is(result.getInternal().getItem()))
                         .filter(r -> r.getIngredients().get(0) == leftInput.asVanillaIngredient() && r.getIngredients().get(1) == rightInput.asVanillaIngredient())
@@ -821,8 +816,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes()
-                        .getOrDefault(AARecipeTypes.ANVIL.get(), Maps.newHashMap())
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL.get())
                         .values().stream()
                         .filter(r -> r.getResultItem(ServerLifecycleHooks.getCurrentServer().registryAccess()).is(result.getInternal().getItem()))
                         .filter(r -> r.getIngredients().get(0).test(leftInput.getInternal()) && r.getIngredients().get(1).test(rightInput.getInternal()))
@@ -848,7 +842,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL.get()).remove(new ResourceLocation(AnvilAPI.MOD_ID, id));
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL.get()).remove(new ResourceLocation(AnvilAPI.MOD_ID, id));
             }
 
             @Override
@@ -868,7 +862,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL.get()).remove(new ResourceLocation(modId, id));
+                AARecipeHelper.getRecipes(AARecipeTypes.ANVIL.get()).remove(new ResourceLocation(modId, id));
             }
 
             @Override

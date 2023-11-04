@@ -3,12 +3,12 @@ package hantonik.anvilapi.utils;
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import hantonik.anvilapi.AnvilAPI;
-import hantonik.anvilapi.event.callback.AddServerReloadListenerCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public final class AADisabledRecipes implements ResourceManagerReloadListener {
+public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataPackReload {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path PATH = FabricLoader.getInstance().getConfigDir().toAbsolutePath();
 
@@ -43,8 +43,6 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
         } catch (IOException e) {
             AnvilAPI.LOGGER.error("Failed to create {} config directory.", AnvilAPI.MOD_NAME);
         }
-
-        AddServerReloadListenerCallback.EVENT.register(((resources, access) -> resources.listeners()));
     }
 
     public static void disableRepairRecipe(Ingredient baseItem, Ingredient repairItem) {
@@ -76,7 +74,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
     }
 
     @Override
-    public void onResourceManagerReload(ResourceManager manager) {
+    public void startDataPackReload(MinecraftServer server, CloseableResourceManager manager) {
         REPAIR.clear();
         ENCHANTMENTS.clear();
         REPAIR_ITEMS.clear();
@@ -173,7 +171,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 REPAIR_ITEMS.add(repairItem);
             }
         } catch (IOException e) {
-            AnvilAPI.LOGGER.error(e);
+            AnvilAPI.LOGGER.error("Could no load disabled repair recipes.", e);
         }
     }
 }
