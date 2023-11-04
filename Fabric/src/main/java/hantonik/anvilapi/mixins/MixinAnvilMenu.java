@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,7 +58,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
         this.cost.set(0);
 
-        var recipe = this.player.level().getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL, this.inputSlots, this.player.level()).orElse(null);
+        var recipe = this.player.level().getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL, this.inputSlots, this.player.level()).map(RecipeHolder::value).orElse(null);
 
         if (recipe != null) {
             var input1 = this.inputSlots.getItem(0);
@@ -157,7 +158,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     @Inject(at = @At("HEAD"), method = "createResult", cancellable = true)
     public void createResult(CallbackInfo callback) {
         var level = this.player.level();
-        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL, this.inputSlots, level).orElse(null);
+        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL, this.inputSlots, level).map(RecipeHolder::value).orElse(null);
 
         if (recipe != null) {
             var stack = recipe.getResultItem(level.registryAccess());

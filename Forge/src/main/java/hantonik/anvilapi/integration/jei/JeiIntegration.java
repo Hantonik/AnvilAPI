@@ -21,6 +21,7 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Blocks;
 
@@ -46,7 +47,7 @@ public final class JeiIntegration implements IModPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
-        registration.addRecipes(AnvilRecipeCategory.RECIPE_TYPE, AARecipeHelper.getRecipeManager().getAllRecipesFor(AARecipeTypes.ANVIL.get()));
+        registration.addRecipes(AnvilRecipeCategory.RECIPE_TYPE, AARecipeHelper.getRecipeManager().getAllRecipesFor(AARecipeTypes.ANVIL.get()).stream().map(RecipeHolder::value).toList());
     }
 
     @Override
@@ -177,7 +178,7 @@ public final class JeiIntegration implements IModPlugin {
         var recipes = new ArrayList<IJeiAnvilRecipe>();
 
         recipes.addAll(recipesToAdd);
-        recipes.addAll(AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR.get()).values().stream().map(recipe -> (IJeiAnvilRecipe) new AnvilRecipe(Stream.of(new ItemStack(recipe.getBaseItem())).peek(input -> input.setDamageValue(input.getMaxDamage())).toList(), Arrays.asList(recipe.getRepairItem().getItems()), Stream.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess())).peek(input -> input.setDamageValue(input.getMaxDamage() * 3 / 4)).toList())).toList());
+        recipes.addAll(AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR.get()).values().stream().map(RecipeHolder::value).map(recipe -> (IJeiAnvilRecipe) new AnvilRecipe(Stream.of(new ItemStack(recipe.getBaseItem())).peek(input -> input.setDamageValue(input.getMaxDamage())).toList(), Arrays.asList(recipe.getRepairItem().getItems()), Stream.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess())).peek(input -> input.setDamageValue(input.getMaxDamage() * 3 / 4)).toList())).toList());
 
         if (!recipes.isEmpty())
             registration.getRecipeManager().addRecipes(RecipeTypes.ANVIL, recipes.stream().distinct().toList());

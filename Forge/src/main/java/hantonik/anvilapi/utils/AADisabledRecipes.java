@@ -2,7 +2,9 @@ package hantonik.anvilapi.utils;
 
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
+import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -10,7 +12,6 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -121,7 +122,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                     if (baseItemJson.isJsonPrimitive())
                         baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                     else
-                        baseItem = CraftingHelper.getIngredient(baseItemJson, false);
+                        baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
 
                     if (repairJson.getAsJsonObject().has("repairItem")) {
                         var repairItemJson = repairJson.getAsJsonObject().get("repairItem");
@@ -129,7 +130,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                         if (repairItemJson.isJsonPrimitive())
                             repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                         else
-                            repairItem = CraftingHelper.getIngredient(repairJson.getAsJsonObject().get("repairItem"), true);
+                            repairItem = Util.getOrThrow(Ingredient.CODEC.parse(JsonOps.INSTANCE, repairJson.getAsJsonObject().get("repairItem")), IllegalStateException::new);
                     }
                 } else
                     baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairJson, "baseItem")));
@@ -149,7 +150,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                         if (baseItemJson.isJsonPrimitive())
                             baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                         else
-                            baseItem = CraftingHelper.getIngredient(baseItemJson, false);
+                            baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
                     }
 
                     enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(GsonHelper.getAsString(enchantmentJson.getAsJsonObject(), "enchantment")));
@@ -166,7 +167,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 if (repairItemJson.isJsonPrimitive())
                     repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                 else
-                    repairItem = CraftingHelper.getIngredient(repairItemJson, false);
+                    repairItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, repairItemJson), IllegalStateException::new);
 
                 REPAIR_ITEMS.add(repairItem);
             }

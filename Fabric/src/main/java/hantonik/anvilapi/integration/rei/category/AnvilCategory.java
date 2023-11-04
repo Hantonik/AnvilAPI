@@ -52,7 +52,7 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
     @Override
     public List<Widget> setupDisplay(AnvilDisplay display, Rectangle bounds) {
         List<Widget> widgets = Lists.newArrayList();
-        var recipe = display.recipe;
+        var recipe = display.recipe.value();
 
         var startPoint = new Point(bounds.getMinX() + 5, bounds.getMinY() + 5);
 
@@ -83,8 +83,8 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
                     if (mouseX > startPoint.x + 9 && mouseX < startPoint.x + 27 && mouseY > startPoint.y + 39 && mouseY < startPoint.y + 57) {
                         var item = recipe.getReturn(0);
 
-                        graphics.renderItem(item, mouseX + 12, mouseY + 20);
-                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 20);
+                        graphics.renderItem(item, mouseX + 12, mouseY + 30);
+                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 30);
                     }
                 }
 
@@ -92,8 +92,8 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
                     if (mouseX > startPoint.x + 58 && mouseX < startPoint.x + 76 && mouseY > startPoint.y + 39 && mouseY < startPoint.y + 57) {
                         var item = recipe.getReturn(1);
 
-                        graphics.renderItem(item, mouseX + 12, mouseY + 20);
-                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 20);
+                        graphics.renderItem(item, mouseX + 12, mouseY + 30);
+                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 30);
                     }
                 }
 

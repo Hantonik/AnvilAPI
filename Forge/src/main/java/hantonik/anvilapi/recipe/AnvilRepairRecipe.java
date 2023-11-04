@@ -1,23 +1,27 @@
 package hantonik.anvilapi.recipe;
 
+import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import hantonik.anvilapi.api.recipe.IAnvilRepairRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
 import hantonik.anvilapi.utils.AAItemHelper;
 import lombok.Getter;
-import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.RequirementsStrategy;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,36 +29,29 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
 
 public class AnvilRepairRecipe implements IAnvilRepairRecipe {
     private final ResourceLocation serializerName;
 
     private final List<ICondition> conditions = Lists.newArrayList();
-    private final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
+    private final Map<String, Criterion<?>> criteria = Maps.newLinkedHashMap();
 
-    private final ResourceLocation id;
     private final Item baseItem;
     private final Ingredient repairItem;
 
-    public AnvilRepairRecipe(ResourceLocation id, Item baseItem, Ingredient repairItem) {
+    public AnvilRepairRecipe(Item baseItem, Ingredient repairItem) {
         this.serializerName = new ResourceLocation("anvil_repair");
 
-        this.id = id;
         this.baseItem = baseItem;
         this.repairItem = repairItem;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return this.id;
     }
 
     @Override
@@ -97,45 +94,44 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         return AARecipeSerializers.ANVIL_REPAIR.get();
     }
 
-    public AnvilRepairRecipe addCriterion(String name, CriterionTriggerInstance criterion) {
-        this.advancementBuilder.addCriterion(name, criterion);
+    public AnvilRepairRecipe addCondition(ICondition condition) {
+        this.conditions.add(condition);
 
         return this;
     }
 
-    public void build(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
-        if (this.advancementBuilder.getCriteria().isEmpty())
+    public AnvilRepairRecipe addCriterion(String name, Criterion<?> criterion) {
+        this.criteria.put(name, criterion);
+
+        return this;
+    }
+
+    public void build(RecipeOutput output, ResourceLocation id) {
+        if (this.criteria.isEmpty())
             throw new IllegalStateException("No way of obtaining recipe " + id);
 
-        this.advancementBuilder.parent(new ResourceLocation("recipes/root"))
-                .addCriterion("has_the_recipe", new RecipeUnlockedTrigger.TriggerInstance(ContextAwarePredicate.ANY, id))
-                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
-        consumer.accept(new Result(id));
+        var advancementBuilder = output.advancement()
+                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
+                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
+        output.accept(new AnvilRepairRecipe.Result(id, advancementBuilder.build(id.withPrefix("recipes/"))));
     }
 
     public static class Serializer implements RecipeSerializer<IAnvilRepairRecipe> {
         @Override
-        public IAnvilRepairRecipe fromJson(ResourceLocation id, JsonObject json) {
-            var baseItem = GsonHelper.getAsItem(json, "baseItem");
-            Ingredient repairItem;
-
-            var repairItemJson = json.get("repairItem");
-
-            if (repairItemJson.isJsonPrimitive())
-                repairItem = Ingredient.of(GsonHelper.convertToItem(repairItemJson, "repairItem"));
-            else
-                repairItem = Ingredient.fromJson(json.get("repairItem"), false);
-
-            return new AnvilRepairRecipe(id, baseItem, repairItem);
+        public Codec<IAnvilRepairRecipe> codec() {
+            return RecordCodecBuilder.create(instance -> instance.group(
+                    ForgeRegistries.ITEMS.getCodec().fieldOf("baseItem").forGetter(IAnvilRepairRecipe::getBaseItem),
+                    ExtraCodecs.either(ForgeRegistries.ITEMS.getCodec(), Ingredient.CODEC_NONEMPTY).fieldOf("repairItem").forGetter(recipe -> Either.right(recipe.getRepairItem()))
+            ).apply(instance, (baseItem, resultItem) -> new AnvilRepairRecipe(baseItem, resultItem.right().isPresent() ? resultItem.right().orElseThrow() : Ingredient.of(resultItem.orThrow()))));
         }
 
         @Nullable
         @Override
-        public IAnvilRepairRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
+        public IAnvilRepairRecipe fromNetwork(FriendlyByteBuf buffer) {
             var baseItem = ForgeRegistries.ITEMS.getValue(buffer.readResourceLocation());
             var repairItem = Ingredient.fromNetwork(buffer);
 
-            return new AnvilRepairRecipe(id, baseItem, repairItem);
+            return new AnvilRepairRecipe(baseItem, repairItem);
         }
 
         @Override
@@ -148,11 +144,27 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
     @Getter
     private class Result implements FinishedRecipe {
         private final ResourceLocation id;
-        private final ResourceLocation advancementId;
+        private final AdvancementHolder advancement;
 
-        Result(ResourceLocation id) {
+        Result(ResourceLocation id, AdvancementHolder advancement) {
             this.id = id;
-            this.advancementId = new ResourceLocation(id.getNamespace(), "recipes/" + id.getPath());
+            this.advancement = advancement;
+        }
+
+        @Override
+        public ResourceLocation id() {
+            return this.id;
+        }
+
+        @Nullable
+        @Override
+        public AdvancementHolder advancement() {
+            return this.advancement;
+        }
+
+        @Override
+        public RecipeSerializer<IAnvilRepairRecipe> type() {
+            return AARecipeSerializers.ANVIL_REPAIR.get();
         }
 
         @Override
@@ -164,8 +176,12 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
             if (!conditions.isEmpty()) {
                 var conditionsArray = new JsonArray();
 
-                for (var condition : conditions)
-                    conditionsArray.add(CraftingHelper.serialize(condition));
+                for (var condition : conditions) {
+                    var conditionJson = new JsonObject();
+                    ForgeHooks.writeCondition(condition, conditionJson);
+
+                    conditionsArray.add(conditionJson);
+                }
 
                 json.add("conditions", conditionsArray);
             }
@@ -178,18 +194,7 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         @Override
         public void serializeRecipeData(JsonObject json) {
             json.add("baseItem", AAItemHelper.serialize(baseItem));
-            json.add("repairItem", repairItem.toJson());
-        }
-
-        @Override
-        public RecipeSerializer<?> getType() {
-            return ForgeRegistries.RECIPE_SERIALIZERS.getValue(serializerName);
-        }
-
-        @Nullable
-        @Override
-        public JsonObject serializeAdvancement() {
-            return advancementBuilder.serializeToJson();
+            json.add("repairItem", repairItem.toJson(false));
         }
     }
 }

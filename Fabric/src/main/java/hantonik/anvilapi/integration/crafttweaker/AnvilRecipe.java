@@ -10,7 +10,7 @@ import hantonik.anvilapi.init.AARecipeTypes;
 import hantonik.anvilapi.utils.AARecipeHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenCodeType.Name("mods." + AnvilAPI.MOD_ID + ".Anvil")
@@ -21,7 +21,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience)));
             }
 
             @Override
@@ -41,7 +41,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience)));
             }
 
             @Override
@@ -61,7 +61,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).shapeless(shapeless)));
             }
 
             @Override
@@ -81,7 +81,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).shapeless(shapeless)));
             }
 
             @Override
@@ -101,7 +101,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput)));
             }
 
             @Override
@@ -121,7 +121,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput)));
             }
 
             @Override
@@ -141,7 +141,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless)));
             }
 
             @Override
@@ -161,7 +161,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless)));
             }
 
             @Override
@@ -181,7 +181,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability)));
             }
 
             @Override
@@ -201,7 +201,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability)));
             }
 
             @Override
@@ -221,7 +221,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless)));
             }
 
             @Override
@@ -241,7 +241,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless)));
             }
 
             @Override
@@ -261,7 +261,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -281,7 +281,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -301,7 +301,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -321,7 +321,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -341,7 +341,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -361,7 +361,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -381,7 +381,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -401,7 +401,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -421,7 +421,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -441,7 +441,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -461,7 +461,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), rightInput.asVanillaIngredient(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -481,7 +481,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.asVanillaIngredient(), leftInputCount, rightInput.asVanillaIngredient(), rightInputCount, experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -501,7 +501,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience)));
             }
 
             @Override
@@ -521,7 +521,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).shapeless(shapeless)));
             }
 
             @Override
@@ -541,7 +541,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput)));
             }
 
             @Override
@@ -561,7 +561,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).shapeless(shapeless)));
             }
 
             @Override
@@ -581,7 +581,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability)));
             }
 
             @Override
@@ -601,7 +601,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).shapeless(shapeless)));
             }
 
             @Override
@@ -621,7 +621,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -641,7 +641,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -661,7 +661,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -681,7 +681,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -701,7 +701,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal())));
             }
 
             @Override
@@ -721,7 +721,7 @@ public final class AnvilRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRecipe(result.getInternal(), leftInput.getInternal(), rightInput.getInternal(), experience).consume(0, consumeLeftInput).consume(1, consumeRightInput).setUseDurability(0, useLeftItemDurability).setUseDurability(1, useRightItemDurability).setReturnItem(0, leftReturnItem.getInternal()).setReturnItem(1, rightReturnItem.getInternal()).shapeless(shapeless)));
             }
 
             @Override
@@ -743,9 +743,9 @@ public final class AnvilRecipe {
             public void apply() {
                 AARecipeHelper.getRecipes(AARecipeTypes.ANVIL)
                         .values().stream()
-                        .filter(r -> r.getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
-                        .map(Recipe::getId)
-                        .forEach(r -> AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL).remove(r));
+                        .filter(r -> r.value().getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
+                        .map(RecipeHolder::id)
+                        .forEach(r -> AARecipeHelper.getRecipes(AARecipeTypes.ANVIL).remove(r));
             }
 
             @Override
@@ -767,10 +767,10 @@ public final class AnvilRecipe {
             public void apply() {
                 AARecipeHelper.getRecipes(AARecipeTypes.ANVIL)
                         .values().stream()
-                        .filter(r -> r.getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
-                        .filter(r -> r.getIngredients().get(0) == leftInput.asVanillaIngredient() && r.getIngredients().get(1) == rightInput.asVanillaIngredient())
-                        .map(Recipe::getId)
-                        .forEach(r -> AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL).remove(r));
+                        .filter(r -> r.value().getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
+                        .filter(r -> r.value().getIngredients().get(0) == leftInput.asVanillaIngredient() && r.value().getIngredients().get(1) == rightInput.asVanillaIngredient())
+                        .map(RecipeHolder::id)
+                        .forEach(r -> AARecipeHelper.getRecipes(AARecipeTypes.ANVIL).remove(r));
             }
 
             @Override
@@ -792,11 +792,11 @@ public final class AnvilRecipe {
             public void apply() {
                 AARecipeHelper.getRecipes(AARecipeTypes.ANVIL)
                         .values().stream()
-                        .filter(r -> r.getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
-                        .filter(r -> r.getIngredients().get(0) == leftInput.asVanillaIngredient() && r.getIngredients().get(1) == rightInput.asVanillaIngredient())
-                        .filter(r -> ((IAnvilRecipe) r).getCounts().get(0) == leftInputCount && ((IAnvilRecipe) r).getCounts().get(1) == rightInputCount)
-                        .map(Recipe::getId)
-                        .forEach(r -> AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL).remove(r));
+                        .filter(r -> r.value().getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
+                        .filter(r -> r.value().getIngredients().get(0) == leftInput.asVanillaIngredient() && r.value().getIngredients().get(1) == rightInput.asVanillaIngredient())
+                        .filter(r -> r.value().getCounts().get(0) == leftInputCount && r.value().getCounts().get(1) == rightInputCount)
+                        .map(RecipeHolder::id)
+                        .forEach(r -> AARecipeHelper.getRecipes(AARecipeTypes.ANVIL).remove(r));
             }
 
             @Override
@@ -818,11 +818,11 @@ public final class AnvilRecipe {
             public void apply() {
                 AARecipeHelper.getRecipes(AARecipeTypes.ANVIL)
                         .values().stream()
-                        .filter(r -> r.getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
-                        .filter(r -> r.getIngredients().get(0).test(leftInput.getInternal()) && r.getIngredients().get(1).test(rightInput.getInternal()))
-                        .filter(r -> ((IAnvilRecipe) r).getInputNbt(0).equals(leftInput.getInternal().getOrCreateTag()) && ((IAnvilRecipe) r).getInputNbt(1).equals(rightInput.getInternal().getOrCreateTag()))
-                        .map(Recipe::getId)
-                        .forEach(r -> AARecipeHelper.getRecipes().get(AARecipeTypes.ANVIL).remove(r));
+                        .filter(r -> r.value().getResultItem(Minecraft.getInstance().getConnection().registryAccess()).is(result.getInternal().getItem()))
+                        .filter(r -> r.value().getIngredients().get(0).test(leftInput.getInternal()) && r.value().getIngredients().get(1).test(rightInput.getInternal()))
+                        .filter(r -> r.value().getInputNbt(0).equals(leftInput.getInternal().getOrCreateTag()) && r.value().getInputNbt(1).equals(rightInput.getInternal().getOrCreateTag()))
+                        .map(RecipeHolder::id)
+                        .forEach(r -> AARecipeHelper.getRecipes(AARecipeTypes.ANVIL).remove(r));
             }
 
             @Override

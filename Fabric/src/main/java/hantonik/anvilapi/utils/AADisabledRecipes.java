@@ -2,9 +2,11 @@ package hantonik.anvilapi.utils;
 
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -121,7 +123,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                     if (baseItemJson.isJsonPrimitive())
                         baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                     else
-                        baseItem = Ingredient.fromJson(baseItemJson, false);
+                        baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
 
                     if (repairJson.getAsJsonObject().has("repairItem")) {
                         var repairItemJson = repairJson.getAsJsonObject().get("repairItem");
@@ -129,7 +131,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                         if (repairItemJson.isJsonPrimitive())
                             repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                         else
-                            repairItem = Ingredient.fromJson(repairJson.getAsJsonObject().get("repairItem"), true);
+                            repairItem = Util.getOrThrow(Ingredient.CODEC.parse(JsonOps.INSTANCE, repairJson.getAsJsonObject().get("repairItem")), IllegalStateException::new);
                     }
                 } else
                     baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairJson, "baseItem")));
@@ -149,7 +151,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                         if (baseItemJson.isJsonPrimitive())
                             baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                         else
-                            baseItem = Ingredient.fromJson(baseItemJson, false);
+                            baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
                     }
 
                     enchantment = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(GsonHelper.getAsString(enchantmentJson.getAsJsonObject(), "enchantment")));
@@ -166,7 +168,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                 if (repairItemJson.isJsonPrimitive())
                     repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                 else
-                    repairItem = Ingredient.fromJson(repairItemJson, false);
+                    repairItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, repairItemJson), IllegalStateException::new);
 
                 REPAIR_ITEMS.add(repairItem);
             }

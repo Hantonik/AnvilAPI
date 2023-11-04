@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.client.event.RecipesUpdatedEvent;
@@ -37,19 +38,19 @@ public final class AARecipeHelper {
         return MANAGER;
     }
 
-    public static Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> getRecipes() {
+    public static Map<RecipeType<?>, Map<ResourceLocation, RecipeHolder<?>>> getRecipes() {
         return getRecipeManager().recipes;
     }
 
-    public static <C extends Container, T extends Recipe<C>> Map<ResourceLocation, T> getRecipes(RecipeType<T> type) {
+    public static <C extends Container, T extends Recipe<C>> Map<ResourceLocation, RecipeHolder<T>> getRecipes(RecipeType<T> type) {
         return getRecipeManager().byType(type);
     }
 
-    public static void addRecipe(Recipe<?> recipe) {
-        getRecipeManager().recipes.computeIfAbsent(recipe.getType(), t -> Maps.newHashMap()).put(recipe.getId(), recipe);
+    public static <C extends Container, T extends Recipe<C>> void addRecipe(RecipeHolder<T> recipe) {
+        getRecipeManager().recipes.computeIfAbsent(recipe.value().getType(), t -> Maps.newHashMap()).put(recipe.id(), recipe);
     }
 
-    public static void addRecipe(RecipeType<?> recipeType, Recipe<?> recipe) {
-        getRecipeManager().recipes.computeIfAbsent(recipeType, t -> Maps.newHashMap()).put(recipe.getId(), recipe);
+    public static <C extends Container, T extends Recipe<C>> void addRecipe(RecipeType<T> recipeType, RecipeHolder<T> recipe) {
+        getRecipeManager().recipes.computeIfAbsent(recipeType, t -> Maps.newHashMap()).put(recipe.id(), recipe);
     }
 }

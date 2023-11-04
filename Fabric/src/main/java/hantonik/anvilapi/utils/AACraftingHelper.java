@@ -2,6 +2,9 @@ package hantonik.anvilapi.utils;
 
 import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -12,11 +15,23 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingRecipeCodecs;
 import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AACraftingHelper {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+
+    private static final Codec<CompoundTag> NBT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            TagParser.AS_CODEC.optionalFieldOf("nbt", null).forGetter(nbt -> nbt)
+    ).apply(instance, nbt -> nbt));
+
+    public static final Codec<ItemStack> ITEMSTACK_WITH_NBT_CODEC = Codec.pair(CraftingRecipeCodecs.ITEMSTACK_OBJECT_CODEC, NBT_CODEC).xmap(codec -> {
+        var stack = codec.getFirst().copy();
+        stack.setTag(codec.getSecond());
+
+        return stack;
+    }, stack -> Pair.of(stack, stack.getTag()));
 
     @Nullable
     public static Item getItem(String id, boolean disallowAirInRecipe) {

@@ -1,36 +1,39 @@
 package hantonik.anvilapi.utils;
 
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.minecraft.Util;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipeCodecs;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AAItemHelper {
+    private static final Codec<CompoundTag> NBT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            TagParser.AS_CODEC.optionalFieldOf("nbt", null).forGetter(nbt -> nbt)
+    ).apply(instance, nbt -> nbt));
+
+    public static final Codec<ItemStack> ITEMSTACK_WITH_NBT_CODEC = Codec.pair(CraftingRecipeCodecs.ITEMSTACK_OBJECT_CODEC, NBT_CODEC).xmap(codec -> {
+        var stack = codec.getFirst().copy();
+        stack.setTag(codec.getSecond());
+
+        return stack;
+    }, stack -> Pair.of(stack, stack.getTag()));
+
     public static JsonObject serialize(Item item) {
-        var json = new JsonObject();
-
-        json.addProperty("item", Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(item)).toString());
-
-        return json;
+        return Util.getOrThrow(ForgeRegistries.ITEMS.getCodec().encodeStart(JsonOps.INSTANCE, item), IllegalStateException::new).getAsJsonObject();
     }
 
     public static JsonObject serialize(ItemStack stack) {
-        var json = new JsonObject();
-
-        json.addProperty("item", Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack.getItem())).toString());
-
-        if (stack.getCount() > 1)
-            json.addProperty("count", stack.getCount());
-
-        if (stack.hasTag())
-            json.addProperty("nbt", Objects.requireNonNull(stack.getTag()).toString());
-
-        return json;
+        return Util.getOrThrow(ITEMSTACK_WITH_NBT_CODEC.encodeStart(JsonOps.INSTANCE, stack), IllegalStateException::new).getAsJsonObject();
     }
 
     public static ItemStack withSize(ItemStack stack, int size, boolean container) {

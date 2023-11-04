@@ -17,6 +17,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.item.crafting.RecipeHolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,18 +25,18 @@ import java.util.List;
 import java.util.Optional;
 
 public final class AnvilDisplay extends BasicDisplay {
-    public final IAnvilRecipe recipe;
+    public final RecipeHolder<IAnvilRecipe> recipe;
 
-    public AnvilDisplay(IAnvilRecipe recipe) {
+    public AnvilDisplay(RecipeHolder<IAnvilRecipe> recipe) {
         this(List.of(
-                EntryIngredients.ofItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()),
-                EntryIngredients.ofItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList())
+                EntryIngredients.ofItemStacks(Arrays.stream(recipe.value().getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.value().getInputCount(0), false)).peek(stack -> stack.setTag(recipe.value().getInputNbt(0))).toList()),
+                EntryIngredients.ofItemStacks(Arrays.stream(recipe.value().getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.value().getInputCount(1), false)).peek(stack -> stack.setTag(recipe.value().getInputNbt(1))).toList())
         ), Util.make(new ArrayList<>(), outputs -> {
-            outputs.add(EntryIngredients.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess())));
+            outputs.add(EntryIngredients.of(recipe.value().getResultItem(Minecraft.getInstance().level.registryAccess())));
 
-            outputs.add(recipe.getReturn(0).isEmpty() ? EntryIngredient.empty() : EntryIngredients.of(recipe.getReturn(0)));
-            outputs.add(recipe.getReturn(1).isEmpty() ? EntryIngredient.empty() : EntryIngredients.of(recipe.getReturn(1)));
-        }), Optional.of(recipe.getId()));
+            outputs.add(recipe.value().getReturn(0).isEmpty() ? EntryIngredient.empty() : EntryIngredients.of(recipe.value().getReturn(0)));
+            outputs.add(recipe.value().getReturn(1).isEmpty() ? EntryIngredient.empty() : EntryIngredients.of(recipe.value().getReturn(1)));
+        }), Optional.of(recipe.id()));
     }
 
     public AnvilDisplay(List<EntryIngredient> inputs, List<EntryIngredient> outputs, Optional<ResourceLocation> location) {
@@ -49,8 +50,8 @@ public final class AnvilDisplay extends BasicDisplay {
         return AnvilCategory.ID;
     }
 
-    public static Serializer<AnvilDisplay> serializer() {
-        return Serializer.ofSimple(AnvilDisplay::new);
+    public static BasicDisplay.Serializer<AnvilDisplay> serializer() {
+        return BasicDisplay.Serializer.ofSimple(AnvilDisplay::new);
     }
 
     @RequiredArgsConstructor

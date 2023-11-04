@@ -9,7 +9,7 @@ import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
 import hantonik.anvilapi.utils.AARecipeHelper;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.openzen.zencode.java.ZenCodeType;
 
 @ZenCodeType.Name("mods." + AnvilAPI.MOD_ID + ".AnvilRepair")
@@ -20,7 +20,7 @@ public final class AnvilRepairRecipe {
         CraftTweakerAPI.apply(new IRuntimeAction() {
             @Override
             public void apply() {
-                AARecipeHelper.addRecipe(new hantonik.anvilapi.recipe.AnvilRepairRecipe(new ResourceLocation(AnvilAPI.MOD_ID, id), baseItem.getInternal().getItem(), repairItem.asVanillaIngredient()));
+                AARecipeHelper.addRecipe(new RecipeHolder<>(new ResourceLocation(AnvilAPI.MOD_ID, id), new hantonik.anvilapi.recipe.AnvilRepairRecipe(baseItem.getInternal().getItem(), repairItem.asVanillaIngredient())));
             }
 
             @Override
@@ -42,9 +42,9 @@ public final class AnvilRepairRecipe {
             public void apply() {
                 AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR.get())
                         .values().stream()
-                        .filter(r -> baseItem.getInternal().is(r.getBaseItem()))
-                        .filter(r -> repairItem.asVanillaIngredient() == r.getRepairItem())
-                        .map(Recipe::getId)
+                        .filter(r -> baseItem.getInternal().is(r.value().getBaseItem()))
+                        .filter(r -> repairItem.asVanillaIngredient() == r.value().getRepairItem())
+                        .map(RecipeHolder::id)
                         .forEach(r -> AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR.get()).remove(r));
             }
 
@@ -67,9 +67,9 @@ public final class AnvilRepairRecipe {
             public void apply() {
                 AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR.get())
                         .values().stream()
-                        .filter(r -> baseItem.getInternal().is(r.getBaseItem()))
-                        .filter(r -> r.getRepairItem().test(repairItem.getInternal()))
-                        .map(Recipe::getId)
+                        .filter(r -> baseItem.getInternal().is(r.value().getBaseItem()))
+                        .filter(r -> r.value().getRepairItem().test(repairItem.getInternal()))
+                        .map(RecipeHolder::id)
                         .forEach(r -> AARecipeHelper.getRecipes(AARecipeTypes.ANVIL_REPAIR.get()).remove(r));
             }
 

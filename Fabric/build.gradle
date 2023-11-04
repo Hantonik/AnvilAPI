@@ -55,7 +55,7 @@ dependencies {
 
 	mappings loom.layered() {
 		officialMojangMappings()
-		parchment("org.parchmentmc.data:parchment-$mc_version:$mappings_version@zip")
+//		parchment("org.parchmentmc.data:parchment-$mc_version:$mappings_version@zip")
 	}
 
 	modImplementation "net.fabricmc:fabric-loader:$loader_version"
@@ -63,7 +63,7 @@ dependencies {
 
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-common-api:$jei_version"
 	modCompileOnlyApi "mezz.jei:jei-$mc_version-fabric-api:$jei_version"
-//	modImplementation "mezz.jei:jei-$mc_version-fabric:$jei_version"
+	modCompileOnly "mezz.jei:jei-$mc_version-fabric:$jei_version"
 
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
 	modCompileOnlyApi "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
@@ -72,7 +72,7 @@ dependencies {
 	modImplementation "me.shedaniel.cloth:cloth-config-fabric:$clothconfig_version"
 	modImplementation "dev.architectury:architectury-fabric:$architectury_version"
 
-	modImplementation "com.blamejared.crafttweaker:CraftTweaker-fabric-$mc_version:$crafttweaker_version"
+	modCompileOnly "com.blamejared.crafttweaker:CraftTweaker-fabric-1.20.1:$crafttweaker_version" // Waiting for 1.20.2
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
     annotationProcessor "org.projectlombok:lombok:$lombok_version"

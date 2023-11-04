@@ -52,7 +52,7 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
     @Override
     public List<Widget> setupDisplay(AnvilDisplay display, Rectangle bounds) {
         List<Widget> widgets = Lists.newArrayList();
-        var recipe = display.recipe;
+        var recipe = display.recipe.value();
 
         var startPoint = new Point(bounds.getMinX() + 5, bounds.getMinY() + 5);
 
