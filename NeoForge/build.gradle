@@ -1,0 +1,150 @@
+import com.modrinth.minotaur.dependencies.DependencyType
+import com.modrinth.minotaur.dependencies.ModDependency
+import net.darkhax.curseforgegradle.Constants as CFConstants
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
+plugins {
+    id 'net.neoforged.gradle.userdev' version '7.+'
+//  id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'io.freefair.lombok' version '6.6.+'
+
+    id 'idea'
+    id 'maven-publish'
+}
+
+apply plugin: 'net.darkhax.curseforgegradle'
+apply plugin: 'com.modrinth.minotaur'
+
+base {
+    archivesName = "$mod_name-$mc_version-neoforge"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Using NeoForge: $neoforge_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
+
+minecraft.accessTransformers. file('src/main/resources/META-INF/accesstransformer.cfg')
+
+runs {
+    configureEach {
+        workingDirectory project.file('run')
+
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
+        systemProperty 'forge.logging.console.level', 'debug'
+
+        systemProperty 'mixin.env.remapRefMap', 'true'
+        systemProperty 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
+
+        modSource project.sourceSets.main
+    }
+
+    client {
+        systemProperty 'forge.enabledGameTestNamespaces', mod_id
+    }
+
+    server {
+        systemProperty 'forge.enabledGameTestNamespaces', mod_id
+
+        programArgument '--nogui'
+    }
+}
+
+repositories {
+    maven { url 'https://maven.blamejared.com' }
+    maven { url 'https://maven.shedaniel.me' }
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:${neoforge_version}"
+
+    compileOnly "mezz.jei:jei-$mc_version-common-api:$jei_version" // Waiting for Neo version
+    compileOnly "mezz.jei:jei-$mc_version-forge-api:$jei_version" // Waiting for Neo version
+    compileOnly "mezz.jei:jei-$mc_version-forge:$jei_version" // Waiting for Neo version
+
+    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version" // Waiting for Neo version
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version" // Waiting for Neo version
+    compileOnly "me.shedaniel:RoughlyEnoughItems-forge:$rei_version" // Waiting for Neo version
+
+    compileOnly "me.shedaniel.cloth:cloth-config-forge:$clothconfig_version" // Waiting for Neo version
+    compileOnly "dev.architectury:architectury-forge:$architectury_version" // Waiting for Neo version
+
+    compileOnly "com.blamejared.crafttweaker:CraftTweaker-forge-1.20.1:$crafttweaker_version" // Waiting for Neo 1.20.2 version
+
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+project.evaluationDependsOn(':Changelog')
+
+task publishCurseForge(type: TaskPublishCurseForge) {
+    dependsOn(tasks.jar)
+    dependsOn(':Changelog:makeHtmlChangelog')
+
+    apiToken = System.getenv('CURSEFORGE_TOKEN')
+
+    var modFile = upload('634377', tasks.jar.archiveFile)
+    modFile.displayName = "$archivesBaseName-$version"
+    modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
+    modFile.addGameVersion mc_version
+    modFile.addModLoader('NeoForge')
+    modFile.addJavaVersion 'Java 17'
+    modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
+
+    modFile.changelogType = CFConstants.CHANGELOG_HTML
+    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-neoforge-$version", '&#x60;': '`' ])
+}
+
+modrinth {
+    token = System.getenv('MODRINTH_TOKEN')
+
+    projectId = mod_id
+
+    versionName = "$archivesBaseName-$version"
+    versionNumber = version
+    versionType = 'release'
+
+    gameVersions = [ mc_version ]
+    loaders = [ 'neoforge' ]
+
+    dependencies = [
+            new ModDependency('Xg35A4rS', DependencyType.OPTIONAL),
+            new ModDependency('nfn13YXA', DependencyType.OPTIONAL),
+            new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
+    ]
+
+    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-neoforge-$version", '&#x60;': '`' ]) }
+
+    uploadFile = tasks.jar
+    additionalFiles = [ tasks.sourcesJar ]
+}
+
+tasks.modrinth.dependsOn(tasks.jar)
+tasks.modrinth.dependsOn(tasks.sourcesJar)
+
+tasks.modrinth.dependsOn(':Changelog:makeMarkdownChangelog')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+
+            artifactId "$archivesBaseName"
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

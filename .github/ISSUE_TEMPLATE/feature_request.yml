@@ -43,4 +43,5 @@ body:
       multiple: true
       options:
         - 'Forge'
+        - 'NeoForge'
         - 'Fabric'

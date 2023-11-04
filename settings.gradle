@@ -16,6 +16,7 @@ plugins {
 
 include (
     "Forge",
+    "NeoForge",
     "Fabric",
     "Changelog"
 )

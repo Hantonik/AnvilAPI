@@ -61,13 +61,14 @@ body:
       multiple: true
       options:
         - 'Forge'
+        - 'NeoForge'
         - 'Fabric'
     validations:
       required: true
   - type: input
     attributes:
       label: 'Modloader version:'
-      placeholder: 'Forge / Fabric'
+      placeholder: 'Forge / NeoForge / Fabric'
     validations:
       required: true
   - type: textarea

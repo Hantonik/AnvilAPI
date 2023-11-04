@@ -40,7 +40,9 @@ replay_*.log
 /.idea/
 /.gradle/
 /Forge/src/test/
+/NeoForge/src/test/
 /Fabric/src/test/
 /Forge/run/
+/NeoForge/run/
 /Fabric/run/
 /Changelog/

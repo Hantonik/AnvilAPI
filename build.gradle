@@ -50,6 +50,6 @@ subprojects {
 }
 
 task publishMod {
-    dependsOn(':Forge:publishCurseForge').finalizedBy(':Fabric:publishCurseForge')
-    dependsOn(':Forge:modrinth').finalizedBy(':Fabric:modrinth')
+    dependsOn(':Forge:publishCurseForge').finalizedBy(':NeoForge:publishCurseForge').finalizedBy(':Fabric:publishCurseForge')
+    dependsOn(':Forge:modrinth').finalizedBy(':NeoForge:modrinth').finalizedBy(':Fabric:modrinth')
 }
