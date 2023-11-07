@@ -332,6 +332,7 @@ public class AnvilRecipe implements IAnvilRecipe {
         return AARecipeSerializers.ANVIL.get();
     }
 
+    @CanIgnoreReturnValue
     public AnvilRecipe addCriterion(String name, Criterion<?> criterion) {
         this.criteria.put(name, criterion);
 

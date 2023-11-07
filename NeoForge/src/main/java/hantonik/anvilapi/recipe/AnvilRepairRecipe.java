@@ -1,6 +1,7 @@
 package hantonik.anvilapi.recipe;
 
 import com.google.common.collect.Maps;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -88,6 +89,7 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         return AARecipeSerializers.ANVIL_REPAIR.get();
     }
 
+    @CanIgnoreReturnValue
     public AnvilRepairRecipe addCriterion(String name, Criterion<?> criterion) {
         this.criteria.put(name, criterion);
 
