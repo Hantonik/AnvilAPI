@@ -35,6 +35,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 public class AnvilRecipe implements IAnvilRecipe {
     private final ResourceLocation serializerName;
 
+    private final List<ICondition> conditions = Lists.newArrayList();
     private final Map<String, Criterion<?>> criteria = Maps.newLinkedHashMap();
 
     private final ItemStack result;
@@ -333,6 +335,13 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @CanIgnoreReturnValue
+    public AnvilRecipe addCondition(ICondition condition) {
+        this.conditions.add(condition);
+
+        return this;
+    }
+
+    @CanIgnoreReturnValue
     public AnvilRecipe addCriterion(String name, Criterion<?> criterion) {
         this.criteria.put(name, criterion);
 
@@ -346,7 +355,7 @@ public class AnvilRecipe implements IAnvilRecipe {
         var advancementBuilder = output.advancement()
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
                 .rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
-        output.accept(new Result(id, advancementBuilder.build(id.withPrefix("recipes/"))));
+        output.withConditions(this.conditions.toArray(ICondition[]::new)).accept(new Result(id, advancementBuilder.build(id.withPrefix("recipes/"))));
     }
 
     public static class Serializer implements RecipeSerializer<IAnvilRecipe> {
