@@ -16,12 +16,12 @@ apply plugin: 'net.darkhax.curseforgegradle'
 apply plugin: 'com.modrinth.minotaur'
 
 base {
-    archivesName = "$mod_name-$mc_version-neoforge"
+    archivesName = "$mod_name-$mc_version-neo"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println "Using NeoForge: $neoforge_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
+println "Using NeoForge: $neo_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
 
 minecraft.accessTransformers. file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -55,7 +55,7 @@ repositories {
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:${neoforge_version}"
+    implementation "net.neoforged:neoforge:$neo_version"
 
     compileOnly "mezz.jei:jei-$mc_version-common-api:$jei_version" // Waiting for Neo version
     compileOnly "mezz.jei:jei-$mc_version-forge-api:$jei_version" // Waiting for Neo version
