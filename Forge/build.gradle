@@ -119,14 +119,14 @@ task publishCurseForge(type: TaskPublishCurseForge) {
 
     var modFile = upload('634377', tasks.jar.archiveFile)
     modFile.displayName = "$archivesBaseName-$version"
-    modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
+    modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
     modFile.addGameVersion mc_version
     modFile.addModLoader('Forge')
     modFile.addJavaVersion 'Java 17'
     modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
 
     modFile.changelogType = CFConstants.CHANGELOG_HTML
-    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-forge-$version", '&#x60;': '`' ])
+    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ])
 }
 
 modrinth {
@@ -136,7 +136,7 @@ modrinth {
 
     versionName = "$archivesBaseName-$version"
     versionNumber = version
-    versionType = 'release'
+    versionType = 'beta'
 
     gameVersions = [ mc_version ]
     loaders = [ 'forge' ]
@@ -147,7 +147,7 @@ modrinth {
             new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
     ]
 
-    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-forge-$version", '&#x60;': '`' ]) }
+    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ]) }
 
     uploadFile = tasks.jar
     additionalFiles = [ tasks.sourcesJar ]

@@ -100,7 +100,7 @@ task publishCurseForge(type: TaskPublishCurseForge) {
 
     var modFile = upload('634377', tasks.remapJar.archiveFile)
 	modFile.displayName = "$archivesBaseName-$version"
-	modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
+	modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
 	modFile.addGameVersion mc_version
 	modFile.addModLoader 'Fabric'
 	modFile.addJavaVersion 'Java 17'
@@ -108,7 +108,7 @@ task publishCurseForge(type: TaskPublishCurseForge) {
 	modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
 
 	modFile.changelogType = CFConstants.CHANGELOG_HTML
-	modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-fabric-$version", '&#x60;': '`' ])
+	modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ])
 }
 
 modrinth {
@@ -118,7 +118,7 @@ modrinth {
 
 	versionName = "$archivesBaseName-$version"
 	versionNumber = version
-	versionType = 'release'
+	versionType = 'beta'
 
 	gameVersions = [ mc_version ]
 	loaders = [ 'fabric' ]
@@ -131,7 +131,7 @@ modrinth {
 			new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
 	]
 
-	changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-fabric-$version", '&#x60;': '`' ]) }
+	changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ]) }
 
 	uploadFile = tasks.remapJar
 	additionalFiles = [ tasks.sourcesJar ]
