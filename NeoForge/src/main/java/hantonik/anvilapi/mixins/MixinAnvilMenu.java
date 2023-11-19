@@ -190,6 +190,13 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             var baseItem = this.inputSlots.getItem(0);
             var secondItem = this.inputSlots.getItem(1);
 
+            if (baseItem.isDamageableItem() && !AADisabledRecipes.isValdRepairItem(baseItem, secondItem)) {
+                callback.cancel();
+
+                this.resultSlots.setItem(0, ItemStack.EMPTY);
+                this.broadcastChanges();
+            }
+
             if (secondItem.getItem() instanceof EnchantedBookItem) {
                 if (EnchantmentHelper.getEnchantments(secondItem).entrySet().stream().anyMatch(entry -> AADisabledRecipes.isEnchantmentDisabled(baseItem, entry.getKey(), entry.getValue()))) {
                     callback.cancel();

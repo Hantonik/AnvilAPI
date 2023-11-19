@@ -4,11 +4,14 @@ import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
+import hantonik.anvilapi.init.AARecipeTypes;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -74,6 +77,24 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
 
     public static boolean isRepairItemDisabled(ItemStack repairItem) {
         return REPAIR_ITEMS.stream().anyMatch(item -> item.test(repairItem));
+    }
+
+    public static boolean isValdRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        if (isRepairItemDisabled(repairCandidate) || isRepairDisabled(stack, repairCandidate))
+            return false;
+
+        var level = Minecraft.getInstance().level;
+
+        if (level != null) {
+            var container = new SimpleContainer(2);
+            container.addItem(stack);
+            container.addItem(repairCandidate);
+
+            if (level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL_REPAIR.get(), container, level).isPresent())
+                return true;
+        }
+
+        return stack.getItem().isValidRepairItem(stack, repairCandidate);
     }
 
     @Override

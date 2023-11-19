@@ -4,14 +4,17 @@ import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
+import hantonik.anvilapi.init.AARecipeTypes;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -73,6 +76,24 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
 
     public static boolean isRepairItemDisabled(ItemStack repairItem) {
         return REPAIR_ITEMS.stream().anyMatch(item -> item.test(repairItem));
+    }
+
+    public static boolean isValdRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        if (isRepairItemDisabled(repairCandidate) || isRepairDisabled(stack, repairCandidate))
+            return false;
+
+        var level = Minecraft.getInstance().level;
+
+        if (level != null) {
+            var container = new SimpleContainer(2);
+            container.addItem(stack);
+            container.addItem(repairCandidate);
+
+            if (level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL_REPAIR, container, level).isPresent())
+                return true;
+        }
+
+        return stack.getItem().isValidRepairItem(stack, repairCandidate);
     }
 
     @Override
