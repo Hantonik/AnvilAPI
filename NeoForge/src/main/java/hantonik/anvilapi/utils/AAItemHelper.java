@@ -8,12 +8,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipeCodecs;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AAItemHelper {
@@ -29,7 +29,7 @@ public final class AAItemHelper {
     }, stack -> Pair.of(stack, stack.getTag()));
 
     public static JsonObject serialize(Item item) {
-        return Util.getOrThrow(ForgeRegistries.ITEMS.getCodec().encodeStart(JsonOps.INSTANCE, item), IllegalStateException::new).getAsJsonObject();
+        return Util.getOrThrow(BuiltInRegistries.ITEM.byNameCodec().encodeStart(JsonOps.INSTANCE, item), IllegalStateException::new).getAsJsonObject();
     }
 
     public static JsonObject serialize(ItemStack stack) {

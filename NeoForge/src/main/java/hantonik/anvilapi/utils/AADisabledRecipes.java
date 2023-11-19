@@ -4,18 +4,21 @@ import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
+import hantonik.anvilapi.init.AARecipeTypes;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,6 +77,24 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
 
     public static boolean isRepairItemDisabled(ItemStack repairItem) {
         return REPAIR_ITEMS.stream().anyMatch(item -> item.test(repairItem));
+    }
+
+    public static boolean isValdRepairItem(ItemStack stack, ItemStack repairCandidate) {
+        if (isRepairItemDisabled(repairCandidate) || isRepairDisabled(stack, repairCandidate))
+            return false;
+
+        var level = Minecraft.getInstance().level;
+
+        if (level != null) {
+            var container = new SimpleContainer(2);
+            container.addItem(stack);
+            container.addItem(repairCandidate);
+
+            if (level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL_REPAIR.get(), container, level).isPresent())
+                return true;
+        }
+
+        return stack.getItem().isValidRepairItem(stack, repairCandidate);
     }
 
     @Override
@@ -135,6 +156,14 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 } else
                     baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairJson, "baseItem")));
 
+                for (var baseStack : baseItem.getItems()) {
+                    if (repairItem == Ingredient.EMPTY)
+                        AnvilAPI.LOGGER.debug("Disabling repair recipe for {} with any", BuiltInRegistries.ITEM.getKey(baseStack.getItem()));
+                    else
+                        for (var repairStack : repairItem.getItems())
+                            AnvilAPI.LOGGER.debug("Disabling repair recipe for {} with {}", BuiltInRegistries.ITEM.getKey(baseStack.getItem()), BuiltInRegistries.ITEM.getKey(repairStack.getItem()));
+                }
+
                 REPAIR.add(Pair.of(baseItem, repairItem));
             }
 
@@ -153,10 +182,16 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                             baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
                     }
 
-                    enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(GsonHelper.getAsString(enchantmentJson.getAsJsonObject(), "enchantment")));
+                    enchantment = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(GsonHelper.getAsString(enchantmentJson.getAsJsonObject(), "enchantment")));
                     enchantmentLevel = GsonHelper.getAsInt(enchantmentJson.getAsJsonObject(), "level", -1);
                 } else
-                    enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchantmentJson.getAsString()));
+                    enchantment = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(enchantmentJson.getAsString()));
+
+                if (baseItem == Ingredient.EMPTY)
+                    AnvilAPI.LOGGER.debug("Disabling enchantment recipe with {}", BuiltInRegistries.ENCHANTMENT.getKey(enchantment));
+                else
+                    for (var baseStack : baseItem.getItems())
+                        AnvilAPI.LOGGER.debug("Disabling enchantment recipe for {} with {}", BuiltInRegistries.ITEM.getKey(baseStack.getItem()), BuiltInRegistries.ENCHANTMENT.getKey(enchantment));
 
                 ENCHANTMENTS.add(Pair.of(Pair.of(enchantment, enchantmentLevel), baseItem));
             }
@@ -168,6 +203,9 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                     repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                 else
                     repairItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, repairItemJson), IllegalStateException::new);
+
+                for (var repairStack : repairItem.getItems())
+                    AnvilAPI.LOGGER.debug("Disabling repair recipes with {}", BuiltInRegistries.ITEM.getKey(repairStack.getItem()));
 
                 REPAIR_ITEMS.add(repairItem);
             }

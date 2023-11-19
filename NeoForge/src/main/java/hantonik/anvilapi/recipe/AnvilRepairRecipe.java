@@ -17,6 +17,7 @@ import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.FriendlyByteBuf;
@@ -30,7 +31,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,15 +121,15 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         @Override
         public Codec<IAnvilRepairRecipe> codec() {
             return RecordCodecBuilder.create(instance -> instance.group(
-                    ForgeRegistries.ITEMS.getCodec().fieldOf("baseItem").forGetter(IAnvilRepairRecipe::getBaseItem),
-                    ExtraCodecs.either(ForgeRegistries.ITEMS.getCodec(), Ingredient.CODEC_NONEMPTY).fieldOf("repairItem").forGetter(recipe -> Either.right(recipe.getRepairItem()))
+                    BuiltInRegistries.ITEM.byNameCodec().fieldOf("baseItem").forGetter(IAnvilRepairRecipe::getBaseItem),
+                    ExtraCodecs.either(BuiltInRegistries.ITEM.byNameCodec(), Ingredient.CODEC_NONEMPTY).fieldOf("repairItem").forGetter(recipe -> Either.right(recipe.getRepairItem()))
             ).apply(instance, (baseItem, resultItem) -> new AnvilRepairRecipe(baseItem, resultItem.right().isPresent() ? resultItem.right().orElseThrow() : Ingredient.of(resultItem.orThrow()))));
         }
 
         @Nullable
         @Override
         public IAnvilRepairRecipe fromNetwork(FriendlyByteBuf buffer) {
-            var baseItem = ForgeRegistries.ITEMS.getValue(buffer.readResourceLocation());
+            var baseItem = BuiltInRegistries.ITEM.get(buffer.readResourceLocation());
             var repairItem = Ingredient.fromNetwork(buffer);
 
             return new AnvilRepairRecipe(baseItem, repairItem);
@@ -137,7 +137,7 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
 
         @Override
         public void toNetwork(FriendlyByteBuf buffer, IAnvilRepairRecipe recipe) {
-            buffer.writeResourceLocation(ForgeRegistries.ITEMS.getKey(recipe.getBaseItem()));
+            buffer.writeResourceLocation(BuiltInRegistries.ITEM.getKey(recipe.getBaseItem()));
             recipe.getRepairItem().toNetwork(buffer);
         }
     }
