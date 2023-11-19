@@ -136,6 +136,14 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                 } else
                     baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairJson, "baseItem")));
 
+                for (var baseStack : baseItem.getItems()) {
+                    if (repairItem == Ingredient.EMPTY)
+                        AnvilAPI.LOGGER.debug("Disabling repair recipe for {} with any", BuiltInRegistries.ITEM.getKey(baseStack.getItem()));
+                    else
+                        for (var repairStack : repairItem.getItems())
+                            AnvilAPI.LOGGER.debug("Disabling repair recipe for {} with {}", BuiltInRegistries.ITEM.getKey(baseStack.getItem()), BuiltInRegistries.ITEM.getKey(repairStack.getItem()));
+                }
+
                 REPAIR.add(Pair.of(baseItem, repairItem));
             }
 
@@ -159,6 +167,12 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                 } else
                     enchantment = BuiltInRegistries.ENCHANTMENT.get(new ResourceLocation(enchantmentJson.getAsString()));
 
+                if (baseItem == Ingredient.EMPTY)
+                    AnvilAPI.LOGGER.debug("Disabling enchantment recipe with {}", BuiltInRegistries.ENCHANTMENT.getKey(enchantment));
+                else
+                    for (var baseStack : baseItem.getItems())
+                        AnvilAPI.LOGGER.debug("Disabling enchantment recipe for {} with {}", BuiltInRegistries.ITEM.getKey(baseStack.getItem()), BuiltInRegistries.ENCHANTMENT.getKey(enchantment));
+
                 ENCHANTMENTS.add(Pair.of(Pair.of(enchantment, enchantmentLevel), baseItem));
             }
 
@@ -169,6 +183,9 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
                     repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                 else
                     repairItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, repairItemJson), IllegalStateException::new);
+
+                for (var repairStack : repairItem.getItems())
+                    AnvilAPI.LOGGER.debug("Disabling repair recipes with {}", BuiltInRegistries.ITEM.getKey(repairStack.getItem()));
 
                 REPAIR_ITEMS.add(repairItem);
             }

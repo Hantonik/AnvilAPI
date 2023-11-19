@@ -16,7 +16,7 @@ apply plugin: 'net.darkhax.curseforgegradle'
 apply plugin: 'com.modrinth.minotaur'
 
 base {
-    archivesName = "$mod_name-$mc_version-neo"
+    archivesName = "$mod_name-$mc_version-neoforge"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
