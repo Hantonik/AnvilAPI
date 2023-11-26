@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
@@ -15,17 +14,18 @@ import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.Map;
 
-public final class AARecipeHelper implements ServerLifecycleEvents.StartDataPackReload, ServerLifecycleEvents.SyncDataPackContents {
+public final class AARecipeHelper implements ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.EndDataPackReload {
     private static RecipeManager MANAGER;
 
     @Override
-    public void startDataPackReload(MinecraftServer server, CloseableResourceManager manager) {
+    public void onServerStarted(MinecraftServer server) {
         MANAGER = server.getRecipeManager();
     }
 
     @Override
-    public void onSyncDataPackContents(ServerPlayer player, boolean joined) {
-        MANAGER = player.level().getRecipeManager();
+    public void endDataPackReload(MinecraftServer server, CloseableResourceManager resourceManager, boolean success) {
+        if (success)
+            MANAGER = server.getRecipeManager();
     }
 
     public static RecipeManager getRecipeManager() {

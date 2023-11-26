@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataPackReload {
+public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.EndDataPackReload {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path PATH = FabricLoader.getInstance().getConfigDir().toAbsolutePath();
 
@@ -96,8 +96,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
         return stack.getItem().isValidRepairItem(stack, repairCandidate);
     }
 
-    @Override
-    public void startDataPackReload(MinecraftServer server, CloseableResourceManager manager) {
+    public void reload() {
         REPAIR.clear();
         ENCHANTMENTS.clear();
         REPAIR_ITEMS.clear();
@@ -213,5 +212,16 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.StartDataP
         } catch (IOException e) {
             AnvilAPI.LOGGER.error("Could no load disabled repair recipes.", e);
         }
+    }
+
+    @Override
+    public void onServerStarted(MinecraftServer server) {
+        this.reload();
+    }
+
+    @Override
+    public void endDataPackReload(MinecraftServer server, CloseableResourceManager manager, boolean success) {
+        if (success)
+            this.reload();
     }
 }

@@ -25,13 +25,14 @@ public final class AnvilAPI implements ModInitializer {
         AARecipeTypes.onInit();
         AARecipeSerializers.onInit();
 
-        this.dataPackEvents();
+        this.serverEvents();
     }
 
-    private void dataPackEvents() {
-        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(new AARecipeHelper());
-        ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(new AARecipeHelper());
+    private void serverEvents() {
+        ServerLifecycleEvents.SERVER_STARTED.register(new AADisabledRecipes());
+        ServerLifecycleEvents.SERVER_STARTED.register(new AARecipeHelper());
 
-        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register(new AADisabledRecipes());
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(new AADisabledRecipes());
+        ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(new AARecipeHelper());
     }
 }
