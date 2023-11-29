@@ -1,18 +1,26 @@
 plugins {
     id 'net.darkhax.curseforgegradle' version '1.0.+' apply false
     id 'com.modrinth.minotaur' version '2.+' apply false
+
+    id 'net.neoforged.gradleutils' version '3.+'
 }
 
 apply from: 'buildtools/ColoredOutput.gradle'
 
-println "Starting build of $mod_name, Version: $mod_version"
+gradleutils.version {
+    tags {
+        label = 'beta'
+    }
+}
+
+println "Starting build of $mod_name, Version: ${gradleutils.version.toString()}"
 
 subprojects {
-    version = mod_version
+    version = gradleutils.version.toString()
     group = "hantonik.$mod_id"
 
     def replaceProperties = [
-        'mod_version': version,
+        'mod_version': gradleutils.version.toString(),
 		'mod_name': mod_name,
 
 		'mc_version': mc_version,
