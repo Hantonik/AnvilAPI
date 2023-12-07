@@ -23,7 +23,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Using NeoForge: $neo_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
 
-minecraft.accessTransformers. file('src/main/resources/META-INF/accesstransformer.cfg')
+minecraft.accessTransformers.file('src/main/resources/META-INF/accesstransformer.cfg')
 
 runs {
     configureEach {
