@@ -76,18 +76,18 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
 
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-common-api:$jei_version")
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge-api:$jei_version")
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:$jei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:$jei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge:$jei_version") // Waiting for 1.20.3
 
-    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version")
-    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version")
-    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version") // Waiting for 1.20.3
 
-    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:$clothconfig_version")
-    implementation fg.deobf("dev.architectury:architectury-forge:$architectury_version")
+    compileOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:$clothconfig_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("dev.architectury:architectury-forge:$architectury_version") // Waiting for 1.20.3
 
-    compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-1.20.1:$crafttweaker_version") // Waiting for 1.20.2
+    compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-1.20.2:$crafttweaker_version") // Waiting for 1.20.3
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
 

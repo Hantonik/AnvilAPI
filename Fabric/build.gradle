@@ -61,18 +61,18 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:$loader_version"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version+$mc_version"
 
-	modCompileOnlyApi "mezz.jei:jei-$mc_version-common-api:$jei_version"
-	modCompileOnlyApi "mezz.jei:jei-$mc_version-fabric-api:$jei_version"
-	modCompileOnly "mezz.jei:jei-$mc_version-fabric:$jei_version"
+	modCompileOnlyApi "mezz.jei:jei-1.20.2-common-api:$jei_version" // Waiting for 1.20.3
+	modCompileOnlyApi "mezz.jei:jei-1.20.2-fabric-api:$jei_version" // Waiting for 1.20.3
+	modCompileOnly "mezz.jei:jei-1.20.2-fabric:$jei_version" // Waiting for 1.20.3
 
-	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version"
-	modCompileOnlyApi "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version"
-	modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version"
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:$rei_version" // Waiting for 1.20.3
+	modCompileOnlyApi "me.shedaniel:RoughlyEnoughItems-api-fabric:$rei_version" // Waiting for 1.20.3
+	modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:$rei_version" // Waiting for 1.20.3
 
-	modImplementation "me.shedaniel.cloth:cloth-config-fabric:$clothconfig_version"
-	modImplementation "dev.architectury:architectury-fabric:$architectury_version"
+	modCompileOnly "me.shedaniel.cloth:cloth-config-fabric:$clothconfig_version" // Waiting for 1.20.3
+	modCompileOnly "dev.architectury:architectury-fabric:$architectury_version" // Waiting for 1.20.3
 
-	modCompileOnly "com.blamejared.crafttweaker:CraftTweaker-fabric-1.20.1:$crafttweaker_version" // Waiting for 1.20.2
+	modCompileOnly "com.blamejared.crafttweaker:CraftTweaker-fabric-1.20.2:$crafttweaker_version" // Waiting for 1.20.3
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
     annotationProcessor "org.projectlombok:lombok:$lombok_version"

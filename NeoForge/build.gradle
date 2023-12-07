@@ -57,18 +57,18 @@ repositories {
 dependencies {
     implementation "net.neoforged:neoforge:$neo_version"
 
-    compileOnly "mezz.jei:jei-$mc_version-common-api:$jei_version" // Waiting for Neo version
-    compileOnly "mezz.jei:jei-$mc_version-forge-api:$jei_version" // Waiting for Neo version
-    compileOnly "mezz.jei:jei-$mc_version-forge:$jei_version" // Waiting for Neo version
+    compileOnly "mezz.jei:jei-1.20.2-common-api:$jei_version" // Waiting for Neo 1.20.3 version
+    compileOnly "mezz.jei:jei-1.20.2-forge-api:$jei_version" // Waiting for Neo 1.20.3 version
+    compileOnly "mezz.jei:jei-1.20.2-forge:$jei_version" // Waiting for Neo 1.20.3 version
 
-    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version" // Waiting for Neo version
-    compileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version" // Waiting for Neo version
-    compileOnly "me.shedaniel:RoughlyEnoughItems-forge:$rei_version" // Waiting for Neo version
+    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version" // Waiting for Neo 1.20.3 version
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version" // Waiting for Neo 1.20.3 version
+    compileOnly "me.shedaniel:RoughlyEnoughItems-forge:$rei_version" // Waiting for Neo 1.20.3 version
 
-    compileOnly "me.shedaniel.cloth:cloth-config-forge:$clothconfig_version" // Waiting for Neo version
-    compileOnly "dev.architectury:architectury-forge:$architectury_version" // Waiting for Neo version
+    compileOnly "me.shedaniel.cloth:cloth-config-forge:$clothconfig_version" // Waiting for Neo 1.20.3 version
+    compileOnly "dev.architectury:architectury-forge:$architectury_version" // Waiting for Neo 1.20.3 version
 
-    compileOnly "com.blamejared.crafttweaker:CraftTweaker-forge-1.20.1:$crafttweaker_version" // Waiting for Neo 1.20.2 version
+    compileOnly "com.blamejared.crafttweaker:CraftTweaker-forge-1.20.2:$crafttweaker_version" // Waiting for Neo 1.20.3 version
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
     annotationProcessor "org.projectlombok:lombok:$lombok_version"
