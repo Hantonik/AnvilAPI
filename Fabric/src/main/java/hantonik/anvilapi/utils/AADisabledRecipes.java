@@ -1,10 +1,13 @@
 package hantonik.anvilapi.utils;
 
+import com.google.common.collect.Lists;
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
@@ -18,7 +21,6 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -92,6 +94,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStar
         return ENCHANTMENT_COMBINING.stream().anyMatch(entry -> (entry.getFirst().getFirst() == enchantment1 && (entry.getFirst().getSecond() == -1 || entry.getFirst().getSecond() == enchantment1Level) && entry.getSecond().getFirst() == enchantment2 && (entry.getSecond().getSecond() == -1 || entry.getSecond().getSecond() == enchantment2Level)) || (entry.getFirst().getFirst() == enchantment2 && (entry.getFirst().getSecond() == -1 || entry.getFirst().getSecond() == enchantment2Level) && entry.getSecond().getFirst() == enchantment1 && (entry.getSecond().getSecond() == -1 || entry.getSecond().getSecond() == enchantment1Level)));
     }
 
+    @Environment(EnvType.CLIENT)
     public static boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
         if (isRepairItemDisabled(repairCandidate) || isRepairDisabled(stack, repairCandidate))
             return false;
