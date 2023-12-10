@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,24 +34,36 @@ public abstract class MixinAnvilScreen extends ItemCombinerScreen<AnvilMenu> {
 
     @Inject(at = @At("HEAD"), method = "slotChanged", cancellable = true)
     public void slotChanged(AbstractContainerMenu menu, int slot, ItemStack stack, CallbackInfo callback) {
+        callback.cancel();
+
         var level = this.player.level();
-
-        if (slot != 2) {
-            this.name.setValue(menu.getSlot(0).hasItem() ? menu.getSlot(0).getItem().getHoverName().getString() : "");
-            this.name.setEditable(menu.getSlot(0).hasItem());
-
-            this.setFocused(this.name);
-        }
-
-        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL, new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), level).orElse(null);
+        var recipe = level.getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL, new SimpleContainer(this.getMenu().getItems().toArray(ItemStack[]::new)), level).map(RecipeHolder::value).orElse(null);
 
         if (recipe != null) {
-            this.name.setValue(menu.getSlot(2).hasItem() ? menu.getSlot(2).getItem().getHoverName().getString() : "");
-            this.name.setEditable(menu.getSlot(2).hasItem());
+            if (slot == AnvilMenu.RESULT_SLOT) {
+                if (!stack.isEmpty() && !this.name.getValue().isEmpty()) {
+                    this.name.setValue(stack.isEmpty() ? "" : stack.getHoverName().getString());
+                    this.name.setEditable(!stack.isEmpty());
 
-            this.setFocused(this.name);
+                    this.setFocused(this.name);
+                }
+            } else if (slot == AnvilMenu.INPUT_SLOT || slot == AnvilMenu.ADDITIONAL_SLOT) {
+                stack = recipe.getResultItem(level.registryAccess());
+
+                this.name.setValue(stack.isEmpty() ? "" : stack.getHoverName().getString());
+                this.name.setEditable(!stack.isEmpty());
+
+                this.setFocused(this.name);
+            }
+        } else {
+            if (slot == AnvilMenu.INPUT_SLOT || slot == AnvilMenu.ADDITIONAL_SLOT) {
+                stack = menu.getSlot(AnvilMenu.INPUT_SLOT).getItem();
+
+                this.name.setValue(stack.isEmpty() ? "" : stack.getHoverName().getString());
+                this.name.setEditable(!stack.isEmpty());
+
+                this.setFocused(this.name);
+            }
         }
-
-        callback.cancel();
     }
 }

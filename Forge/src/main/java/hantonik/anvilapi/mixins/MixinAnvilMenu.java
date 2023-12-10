@@ -79,6 +79,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                     input1.hurtAndBreak(recipe.getInputCount(0), this.player, p -> this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0))));
                 else
                     input1.shrink(recipe.getInputCount(0));
+
+                if (input1.isEmpty())
+                    this.inputSlots.setItem(input1Slot, ItemStack.EMPTY);
             }
 
             if (!recipe.getReturn(0).isEmpty()) {
@@ -102,6 +105,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                     input2.hurtAndBreak(recipe.getInputCount(1), this.player, p -> this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0))));
                 else
                     input2.shrink(recipe.getInputCount(1));
+
+                if (input2.isEmpty())
+                    this.inputSlots.setItem(input2Slot, ItemStack.EMPTY);
             }
 
             if (!recipe.getReturn(1).isEmpty()) {
@@ -137,6 +143,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                 } else
                     level.levelEvent(1030, pos, 0);
             });
+
+            this.inputSlots.setChanged();
 
             callback.cancel();
         }
