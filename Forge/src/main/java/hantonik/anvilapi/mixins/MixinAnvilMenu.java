@@ -44,7 +44,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     public abstract void createResult();
 
     @Inject(at = @At("HEAD"), method = "mayPickup", cancellable = true)
-    protected void mayPickup(Player player, boolean b, CallbackInfoReturnable<Boolean> callback) {
+    protected void mayPickup(Player player, boolean hasStack, CallbackInfoReturnable<Boolean> callback) {
         callback.setReturnValue(player.getAbilities().instabuild || player.experienceLevel >= this.cost.get());
 
         callback.cancel();

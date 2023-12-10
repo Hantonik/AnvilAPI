@@ -27,7 +27,7 @@ minecraft.accessTransformers.file('src/main/resources/META-INF/accesstransformer
 
 runs {
     configureEach {
-        workingDirectory project.file('run')
+        workingDirectory file('run')
 
         systemProperty 'forge.logging.markers', 'REGISTRIES'
         systemProperty 'forge.logging.console.level', 'debug'
@@ -35,7 +35,7 @@ runs {
         systemProperty 'mixin.env.remapRefMap', 'true'
         systemProperty 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
 
-        modSource project.sourceSets.main
+        modSource sourceSets.main
     }
 
     client {
@@ -88,14 +88,14 @@ artifacts {
 
 project.evaluationDependsOn(':Changelog')
 
-task publishCurseForge(type: TaskPublishCurseForge) {
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
     dependsOn(tasks.jar)
     dependsOn(':Changelog:makeHtmlChangelog')
 
     apiToken = System.getenv('CURSEFORGE_TOKEN')
 
     var modFile = upload('634377', tasks.jar.archiveFile)
-    modFile.displayName = "$archivesBaseName-$version"
+    modFile.displayName = "${base.archivesName.get()}-$version"
     modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
     modFile.addGameVersion mc_version
     modFile.addModLoader('NeoForge')
@@ -111,7 +111,7 @@ modrinth {
 
     projectId = mod_id
 
-    versionName = "$archivesBaseName-$version"
+    versionName = "${base.archivesName.get()}-$version"
     versionNumber = version
     versionType = 'beta'
 
@@ -137,13 +137,14 @@ tasks.modrinth.dependsOn(':Changelog:makeMarkdownChangelog')
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        register('mavenJava', MavenPublication) {
             artifact jar
             artifact sourcesJar
 
-            artifactId "$archivesBaseName"
+            artifactId archivesBaseName
         }
     }
+
     repositories {
         mavenLocal()
     }

@@ -92,14 +92,14 @@ artifacts {
 
 project.evaluationDependsOn(':Changelog')
 
-task publishCurseForge(type: TaskPublishCurseForge) {
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
 	dependsOn(tasks.remapJar)
 	dependsOn(':Changelog:makeHtmlChangelog')
 
     apiToken = System.getenv('CURSEFORGE_TOKEN')
 
     var modFile = upload('634377', tasks.remapJar.archiveFile)
-	modFile.displayName = "$archivesBaseName-$version"
+	modFile.displayName = "${base.archivesName.get()}-$version"
 	modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
 	modFile.addGameVersion mc_version
 	modFile.addModLoader 'Fabric'
@@ -108,7 +108,7 @@ task publishCurseForge(type: TaskPublishCurseForge) {
 	modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
 
 	modFile.changelogType = CFConstants.CHANGELOG_HTML
-	modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ])
+	modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version" ])
 }
 
 modrinth {
@@ -116,7 +116,7 @@ modrinth {
 
 	projectId = mod_id
 
-	versionName = "$archivesBaseName-$version"
+	versionName = "${base.archivesName.get()}-$version"
 	versionNumber = version
 	versionType = 'beta'
 
@@ -131,7 +131,7 @@ modrinth {
 			new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
 	]
 
-	changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ]) }
+	changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version" ]) }
 
 	uploadFile = tasks.remapJar
 	additionalFiles = [ tasks.sourcesJar ]
@@ -144,7 +144,7 @@ tasks.modrinth.dependsOn(':Changelog:makeMarkdownChangelog')
 
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		register('mavenJava', MavenPublication) {
 			artifact remapJar
 			artifact sourcesJar
 
