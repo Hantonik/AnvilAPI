@@ -4,7 +4,7 @@ import net.darkhax.curseforgegradle.Constants as CFConstants
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
-    id 'net.minecraftforge.gradle' version '[6.0.14,6.2)'
+    id 'net.minecraftforge.gradle' version '6.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'io.freefair.lombok' version '6.6.+'
@@ -39,7 +39,7 @@ minecraft {
 
     runs {
         configureEach {
-            workingDirectory project.file('run')
+            workingDirectory file('run')
 
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
@@ -48,12 +48,6 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
 
             ideaModule "${rootProject.name}.${project.name}.main"
-
-            mods {
-                anvilapi {
-                    source sourceSets.main
-                }
-            }
         }
 
         client {
@@ -68,6 +62,13 @@ minecraft {
     }
 }
 
+sourceSets.each {
+    var dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
+}
+
 repositories {
     maven { url 'https://maven.blamejared.com' }
     maven { url 'https://maven.shedaniel.me' }
@@ -76,18 +77,18 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
 
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-common-api:$jei_version")
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge-api:$jei_version")
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-common-api:$jei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge-api:$jei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("mezz.jei:jei-1.20.2-forge:$jei_version") // Waiting for 1.20.3
 
-    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version")
-    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version")
-    implementation fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version") // Waiting for 1.20.3
 
-    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:$clothconfig_version")
-    implementation fg.deobf("dev.architectury:architectury-forge:$architectury_version")
+    compileOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:$clothconfig_version") // Waiting for 1.20.3
+    compileOnly fg.deobf("dev.architectury:architectury-forge:$architectury_version") // Waiting for 1.20.3
 
-    compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-1.20.1:$crafttweaker_version") // Waiting for 1.20.2
+    compileOnly fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-1.20.2:$crafttweaker_version") // Waiting for 1.20.3
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
 
@@ -111,14 +112,14 @@ artifacts {
 
 project.evaluationDependsOn(':Changelog')
 
-task publishCurseForge(type: TaskPublishCurseForge) {
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
     dependsOn(tasks.jar)
     dependsOn(':Changelog:makeHtmlChangelog')
 
     apiToken = System.getenv('CURSEFORGE_TOKEN')
 
     var modFile = upload('634377', tasks.jar.archiveFile)
-    modFile.displayName = "$archivesBaseName-$version"
+    modFile.displayName = "${base.archivesName.get()}-$version"
     modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
     modFile.addGameVersion mc_version
     modFile.addModLoader('Forge')
@@ -126,7 +127,7 @@ task publishCurseForge(type: TaskPublishCurseForge) {
     modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
 
     modFile.changelogType = CFConstants.CHANGELOG_HTML
-    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ])
+    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version" ])
 }
 
 modrinth {
@@ -134,7 +135,7 @@ modrinth {
 
     projectId = mod_id
 
-    versionName = "$archivesBaseName-$version"
+    versionName = "${base.archivesName.get()}-$version"
     versionNumber = version
     versionType = 'beta'
 
@@ -147,7 +148,7 @@ modrinth {
             new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
     ]
 
-    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version", '&#x60;': '`' ]) }
+    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version" ]) }
 
     uploadFile = tasks.jar
     additionalFiles = [ tasks.sourcesJar ]
@@ -160,7 +161,7 @@ tasks.modrinth.dependsOn(':Changelog:makeMarkdownChangelog')
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        register('mavenJava', MavenPublication) {
             artifact jar
             artifact sourcesJar
 

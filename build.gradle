@@ -11,19 +11,18 @@ subprojects {
     version = mod_version
     group = "hantonik.$mod_id"
 
-    def replaceProperties = [
-        'mod_version': version,
-		'mod_name': mod_name,
-
-		'mc_version': mc_version,
-
-		'loader_version': loader_version,
-		'fabric_version': fabric_version
-    ]
-
     tasks.withType(ProcessResources).configureEach {
+        var replaceProperties = [
+                'mod_version': version,
+                'mod_name': mod_name,
+
+                'mc_version': mc_version,
+
+                'loader_version': loader_version,
+                'fabric_version': fabric_version
+        ]
+
         inputs.properties replaceProperties
-	    replaceProperties.put 'project', project
 
 	    filesMatching([ 'META-INF/mods.toml', 'fabric.mod.json' ]) {
 	    	expand replaceProperties
@@ -37,9 +36,8 @@ subprojects {
                     'Specification-Vendor': 'Hantonik',
                     'Specification-Version': '1',
                     'Implementation-Title': project.name,
-                    'Implementation-Version': project.jar.archiveVersion,
-                    'Implementation-Vendor': 'Hantonik',
-                    'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                    'Implementation-Version': jar.archiveVersion,
+                    'Implementation-Vendor': 'Hantonik'
             ])
         }
     }
@@ -49,7 +47,7 @@ subprojects {
     }
 }
 
-task publishMod {
+tasks.register('publishMod') {
     dependsOn(':Forge:publishCurseForge').finalizedBy(':NeoForge:publishCurseForge')
     dependsOn(':Forge:modrinth').finalizedBy(':NeoForge:modrinth')
 
