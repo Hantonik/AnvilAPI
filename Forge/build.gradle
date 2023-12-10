@@ -48,12 +48,6 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
 
             ideaModule "${rootProject.name}.${project.name}.main"
-
-            mods {
-                anvilapi {
-                    source sourceSets.main
-                }
-            }
         }
 
         client {
@@ -66,6 +60,13 @@ minecraft {
             args '--nogui'
         }
     }
+}
+
+sourceSets.each {
+    var dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
 }
 
 repositories {

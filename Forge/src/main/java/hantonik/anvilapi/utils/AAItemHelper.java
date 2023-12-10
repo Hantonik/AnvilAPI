@@ -10,18 +10,20 @@ import lombok.NoArgsConstructor;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipeCodecs;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AAItemHelper {
     private static final Codec<CompoundTag> NBT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            TagParser.AS_CODEC.optionalFieldOf("nbt", null).forGetter(nbt -> nbt)
-    ).apply(instance, nbt -> nbt));
+            ExtraCodecs.strictOptionalField(TagParser.AS_CODEC, "nbt").forGetter(Optional::ofNullable)
+    ).apply(instance, nbt -> nbt.orElse(null)));
 
-    public static final Codec<ItemStack> ITEMSTACK_WITH_NBT_CODEC = Codec.pair(CraftingRecipeCodecs.ITEMSTACK_OBJECT_CODEC, NBT_CODEC).xmap(codec -> {
+    public static final Codec<ItemStack> ITEMSTACK_WITH_NBT_CODEC = Codec.pair(ItemStack.ITEM_WITH_COUNT_CODEC, NBT_CODEC).xmap(codec -> {
         var stack = codec.getFirst().copy();
         stack.setTag(codec.getSecond());
 
