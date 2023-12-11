@@ -212,4 +212,19 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             }
         }
     }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int slotIndex) {
+        if (slotIndex == AnvilMenu.RESULT_SLOT) {
+            if (this.slots.get(slotIndex).hasItem()) {
+                if (!this.mayPickup(player, true)) {
+                    this.resetQuickCraft();
+
+                    return ItemStack.EMPTY;
+                }
+            }
+        }
+
+        return super.quickMoveStack(player, slotIndex);
+    }
 }

@@ -130,8 +130,8 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             this.access.execute((level, pos) -> {
                 BlockState blockstate = level.getBlockState(pos);
 
-            if (!player.getAbilities().instabuild && blockstate.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
-                BlockState state1 = AnvilBlock.damage(blockstate);
+                if (!player.getAbilities().instabuild && blockstate.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
+                    BlockState state1 = AnvilBlock.damage(blockstate);
 
                     if (state1 == null) {
                         level.removeBlock(pos, false);
@@ -214,5 +214,20 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                 }
             }
         }
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int slotIndex) {
+        if (slotIndex == AnvilMenu.RESULT_SLOT) {
+            if (this.slots.get(slotIndex).hasItem()) {
+                if (!this.mayPickup(player, true)) {
+                    this.resetQuickCraft();
+
+                    return ItemStack.EMPTY;
+                }
+            }
+        }
+
+        return super.quickMoveStack(player, slotIndex);
     }
 }
