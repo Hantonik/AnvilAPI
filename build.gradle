@@ -24,7 +24,7 @@ subprojects {
 
         inputs.properties replaceProperties
 
-	    filesMatching([ 'META-INF/mods.toml', 'fabric.mod.json' ]) {
+	    filesMatching([ 'META-INF/mods.toml', 'fabric.mod.json', 'pack.mcmeta' ]) {
 	    	expand replaceProperties
 	    }
     }

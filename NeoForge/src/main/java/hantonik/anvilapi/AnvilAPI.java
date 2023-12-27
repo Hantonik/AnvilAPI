@@ -23,7 +23,7 @@ public final class AnvilAPI {
     public static final Marker SETUP_MARKER = MarkerFactory.getMarker("SETUP");
 
     public AnvilAPI(IEventBus bus) {
-        AnvilAPI.LOGGER.info(SETUP_MARKER, "Initializing...");
+        LOGGER.info(SETUP_MARKER, "Initializing...");
 
         bus.register(this);
 
@@ -33,13 +33,11 @@ public final class AnvilAPI {
 
     @SubscribeEvent
     public void commonSetup(final FMLCommonSetupEvent event) {
-        AnvilAPI.LOGGER.info(SETUP_MARKER, "Starting common setup...");
-
-        NeoForge.EVENT_BUS.register(this);
+        LOGGER.info(SETUP_MARKER, "Starting common setup...");
 
         NeoForge.EVENT_BUS.register(new AARecipeHelper());
         NeoForge.EVENT_BUS.register(new AADisabledRecipes());
 
-        AnvilAPI.LOGGER.info(SETUP_MARKER, "Finished common setup!");
+        LOGGER.info(SETUP_MARKER, "Finished common setup!");
     }
 }

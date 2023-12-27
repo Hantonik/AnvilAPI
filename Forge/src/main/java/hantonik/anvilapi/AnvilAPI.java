@@ -23,7 +23,7 @@ public final class AnvilAPI {
     public static final Marker SETUP_MARKER = MarkerFactory.getMarker("SETUP");
 
     public AnvilAPI() {
-        AnvilAPI.LOGGER.info(SETUP_MARKER, "Initializing...");
+        LOGGER.info(SETUP_MARKER, "Initializing...");
 
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -35,13 +35,11 @@ public final class AnvilAPI {
 
     @SubscribeEvent
     public void commonSetup(final FMLCommonSetupEvent event) {
-        AnvilAPI.LOGGER.info(SETUP_MARKER, "Starting common setup...");
-
-        MinecraftForge.EVENT_BUS.register(this);
+        LOGGER.info(SETUP_MARKER, "Starting common setup...");
 
         MinecraftForge.EVENT_BUS.register(new AARecipeHelper());
         MinecraftForge.EVENT_BUS.register(new AADisabledRecipes());
 
-        AnvilAPI.LOGGER.info(SETUP_MARKER, "Finished common setup!");
+        LOGGER.info(SETUP_MARKER, "Finished common setup!");
     }
 }
