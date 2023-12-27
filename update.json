@@ -2,7 +2,7 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
 
   "promos": {
-    "1.20.4-latest": "5.2.0.0-beta",
+    "1.20.4-latest": "5.2.1.0-beta",
 
     "1.20.2-latest": "5.1.1.0-beta",
 
@@ -21,6 +21,7 @@
   },
 
   "1.20.4": {
+    "5.2.1.0-beta": "Compatible with REI",
     "5.2.0.0-beta": "Release for Minecraft 1.20.4"
   },
 
