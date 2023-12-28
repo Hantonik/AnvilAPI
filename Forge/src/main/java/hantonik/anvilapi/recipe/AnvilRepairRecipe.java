@@ -114,7 +114,7 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
             return RecordCodecBuilder.create(instance -> instance.group(
                     ForgeRegistries.ITEMS.getCodec().fieldOf("baseItem").forGetter(AnvilRepairRecipe::getBaseItem),
                     ExtraCodecs.either(ForgeRegistries.ITEMS.getCodec(), Ingredient.CODEC_NONEMPTY).fieldOf("repairItem").forGetter(recipe -> Either.right(recipe.getRepairItem()))
-            ).apply(instance, (baseItem, resultItem) -> new AnvilRepairRecipe(baseItem, resultItem.right().isPresent() ? resultItem.right().orElseThrow() : Ingredient.of(resultItem.orThrow()))));
+            ).apply(instance, (baseItem, repairItem) -> new AnvilRepairRecipe(baseItem, repairItem.right().isPresent() ? repairItem.right().orElseThrow() : Ingredient.of(repairItem.orThrow()))));
         }
 
         @Nullable
