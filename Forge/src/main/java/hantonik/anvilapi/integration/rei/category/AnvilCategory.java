@@ -1,6 +1,7 @@
 package hantonik.anvilapi.integration.rei.category;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.integration.rei.category.display.AnvilDisplay;
 import me.shedaniel.math.Point;
@@ -13,6 +14,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -52,39 +54,42 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
     @Override
     public List<Widget> setupDisplay(AnvilDisplay display, Rectangle bounds) {
         List<Widget> widgets = Lists.newArrayList();
-        var recipe = display.recipe.value();
+        var recipe = display.recipe;
 
         var startPoint = new Point(bounds.getMinX() + 5, bounds.getMinY() + 5);
 
         widgets.add(Widgets.createRecipeBase(bounds));
-        widgets.add(Widgets.createDrawableWidget(((graphics, mouseX, mouseY, delta) -> {
+        widgets.add(Widgets.createDrawableWidget(((helper, stack, mouseX, mouseY, delta) -> {
             var font = Minecraft.getInstance().font;
             var player = Minecraft.getInstance().player;
+            var screen = Minecraft.getInstance().screen;
+            var renderer = Minecraft.getInstance().getItemRenderer();
 
-            graphics.blit(TEXTURE, startPoint.x, startPoint.y, 0, 0, 152, 79);
+            RenderSystem.setShaderTexture(0, TEXTURE);
+            GuiComponent.blit(stack, startPoint.x, startPoint.y, 0, 0, 152, 79);
 
             if (recipe.isShapeless()) {
-                graphics.blit(TEXTURE, startPoint.x + 135, startPoint.y + 64, 153, 0, 18, 16);
+                GuiComponent.blit(stack, startPoint.x + 135, startPoint.y + 64, 153, 0, 18, 16);
 
                 if (mouseX > startPoint.x + 135 && mouseX < startPoint.x + 152 && mouseY > startPoint.y + 64 && mouseY < startPoint.y + 79)
-                    graphics.renderTooltip(font, Component.translatable("text.rei.shapeless"), mouseX, mouseY);
+                    screen.renderTooltip(stack, Component.translatable("text.rei.shapeless"), mouseX, mouseY);
             }
 
-            graphics.drawString(font, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), startPoint.x + 46, startPoint.y + 17, 0xFFFFFFFF);
+            font.drawShadow(stack, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), startPoint.x + 46, startPoint.y + 17, 0xFFFFFFFF);
 
             if (recipe.getExperience() > 0)
-                graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), startPoint.x + 9, startPoint.y + 65, (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+                font.drawShadow(stack, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), startPoint.x + 9, startPoint.y + 65, (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
 
             if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
-                graphics.pose().pushPose();
-                graphics.pose().translate(0, 0, 400);
+                stack.pushPose();
+                stack.translate(0, 0, 400);
 
                 if (!recipe.getReturn(0).isEmpty()) {
                     if (mouseX > startPoint.x + 9 && mouseX < startPoint.x + 27 && mouseY > startPoint.y + 39 && mouseY < startPoint.y + 57) {
                         var item = recipe.getReturn(0);
 
-                        graphics.renderItem(item, mouseX + 12, mouseY + 30);
-                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 30);
+                        renderer.renderGuiItem(stack, item, mouseX + 12, mouseY + 30);
+                        renderer.renderGuiItemDecorations(stack, font, item, mouseX + 12, mouseY + 30);
                     }
                 }
 
@@ -92,12 +97,12 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
                     if (mouseX > startPoint.x + 58 && mouseX < startPoint.x + 76 && mouseY > startPoint.y + 39 && mouseY < startPoint.y + 57) {
                         var item = recipe.getReturn(1);
 
-                        graphics.renderItem(item, mouseX + 12, mouseY + 30);
-                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 30);
+                        renderer.renderGuiItem(stack, item, mouseX + 12, mouseY + 30);
+                        renderer.renderGuiItemDecorations(stack, font, item, mouseX + 12, mouseY + 30);
                     }
                 }
 
-                graphics.pose().popPose();
+                stack.popPose();
             }
         })));
 

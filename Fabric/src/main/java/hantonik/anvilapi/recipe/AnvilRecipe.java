@@ -1,27 +1,28 @@
 package hantonik.anvilapi.recipe;
 
-import com.google.common.collect.Maps;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
+import hantonik.anvilapi.utils.AACraftingHelper;
 import hantonik.anvilapi.utils.AAItemHelper;
+import lombok.Getter;
 import net.minecraft.Util;
-import net.minecraft.advancements.AdvancementRequirements;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -33,12 +34,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 public class AnvilRecipe implements IAnvilRecipe {
-    private final Map<String, Criterion<?>> criteria = Maps.newLinkedHashMap();
+    private final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
 
+    private final ResourceLocation id;
     private final ItemStack result;
     private final NonNullList<Ingredient> inputs;
     private final NonNullList<ItemStack> returns;
@@ -51,39 +52,40 @@ public class AnvilRecipe implements IAnvilRecipe {
 
     private boolean shapeless;
 
-    public AnvilRecipe(ItemStack result, List<ItemStack> leftInput, List<ItemStack> rightInput, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput.stream()), Ingredient.of(rightInput.stream())), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.get(0).hasTag() ? leftInput.get(0).getTag() : new CompoundTag(), rightInput.get(0).hasTag() ? rightInput.get(0).getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.get(0).getCount(), rightInput.get(0).getCount()), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, List<ItemStack> leftInput, List<ItemStack> rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput.stream()), Ingredient.of(rightInput.stream())), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.get(0).hasTag() ? leftInput.get(0).getTag() : new CompoundTag(), rightInput.get(0).hasTag() ? rightInput.get(0).getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.get(0).getCount(), rightInput.get(0).getCount()), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, ItemStack leftInput, ItemStack rightInput, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput), Ingredient.of(rightInput)), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.hasTag() ? leftInput.getTag() : new CompoundTag(), rightInput.hasTag() ? rightInput.getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.getCount(), rightInput.getCount()), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, ItemStack leftInput, ItemStack rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput), Ingredient.of(rightInput)), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.hasTag() ? leftInput.getTag() : new CompoundTag(), rightInput.hasTag() ? rightInput.getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.getCount(), rightInput.getCount()), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, Ingredient leftInput, int leftInputCount, List<ItemStack> rightInput, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, leftInput, Ingredient.of(rightInput.stream())), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), rightInput.get(0).hasTag() ? rightInput.get(0).getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInput.get(0).getCount()), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, int leftInputCount, List<ItemStack> rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, Ingredient.of(rightInput.stream())), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), rightInput.get(0).hasTag() ? rightInput.get(0).getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInput.get(0).getCount()), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, Ingredient leftInput, int leftInputCount, ItemStack rightInput, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, leftInput, Ingredient.of(rightInput)), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), rightInput.hasTag() ? rightInput.getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInput.getCount()), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, int leftInputCount, ItemStack rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, Ingredient.of(rightInput)), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), rightInput.hasTag() ? rightInput.getTag() : new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInput.getCount()), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, List<ItemStack> leftInput, Ingredient rightInput, int rightInputCount, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput.stream()), rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.get(0).hasTag() ? leftInput.get(0).getTag() : new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.get(0).getCount(), rightInputCount), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, List<ItemStack> leftInput, Ingredient rightInput, int rightInputCount, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput.stream()), rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.get(0).hasTag() ? leftInput.get(0).getTag() : new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.get(0).getCount(), rightInputCount), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, ItemStack leftInput, Ingredient rightInput, int rightInputCount, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput), rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.hasTag() ? leftInput.getTag() : new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.getCount(), rightInputCount), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, ItemStack leftInput, Ingredient rightInput, int rightInputCount, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, Ingredient.of(leftInput), rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(leftInput.hasTag() ? leftInput.getTag() : new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInput.getCount(), rightInputCount), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, Ingredient leftInput, int leftInputCount, Ingredient rightInput, int rightInputCount, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInputCount), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, int leftInputCount, Ingredient rightInput, int rightInputCount, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(leftInputCount, rightInputCount), false, experience);
     }
 
-    public AnvilRecipe(ItemStack result, Ingredient leftInput, Ingredient rightInput, int experience) {
-        this(result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(1, 1), false, experience);
+    public AnvilRecipe(ResourceLocation id, ItemStack result, Ingredient leftInput, Ingredient rightInput, int experience) {
+        this(id, result, NonNullList.of(Ingredient.EMPTY, leftInput, rightInput), Util.make(NonNullList.create(), returns -> returns.addAll(List.of(ItemStack.EMPTY, ItemStack.EMPTY))), Util.make(new ArrayList<>(), nbt -> nbt.addAll(List.of(new CompoundTag(), new CompoundTag()))), Util.make(new ArrayList<>(), strictNbt -> strictNbt.addAll(List.of(false, false))), Util.make(new ArrayList<>(), consumes -> consumes.addAll(List.of(true, true))), Util.make(new ArrayList<>(), useDurability -> useDurability.addAll(List.of(false, false))), List.of(1, 1), false, experience);
     }
 
-    protected AnvilRecipe(ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<CompoundTag> nbt, List<Boolean> strictNbt, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
+    protected AnvilRecipe(ResourceLocation id, ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<CompoundTag> nbt, List<Boolean> strictNbt, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
+        this.id = id;
         this.result = result;
         this.inputs = inputs;
         this.returns = returns;
@@ -138,6 +140,11 @@ public class AnvilRecipe implements IAnvilRecipe {
         this.strictNbt.set(inputId, this.hasNbt(inputId));
 
         return this;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -314,43 +321,54 @@ public class AnvilRecipe implements IAnvilRecipe {
         return AARecipeSerializers.ANVIL;
     }
 
-    public AnvilRecipe addCriterion(String name, Criterion<?> criterion) {
-        this.criteria.put(name, criterion);
+    public AnvilRecipe addCriterion(String name, CriterionTriggerInstance criterion) {
+        this.advancementBuilder.addCriterion(name, criterion);
 
         return this;
     }
 
-    public void build(RecipeOutput output, ResourceLocation id) {
-        if (this.criteria.isEmpty())
+    public void build(Consumer<FinishedRecipe> output, ResourceLocation id) {
+        if (this.advancementBuilder.getCriteria().isEmpty())
             throw new IllegalStateException("No way of obtaining recipe " + id);
 
-        var advancementBuilder = output.advancement()
-                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
-        output.accept(id, this, advancementBuilder.build(id.withPrefix("recipes/")));
+        this.advancementBuilder.parent(new ResourceLocation("recipes/root"))
+                .addCriterion("has_the_recipe", new RecipeUnlockedTrigger.TriggerInstance(EntityPredicate.Composite.ANY, id))
+                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
+        output.accept(new Result(id));
     }
 
     public static class Serializer implements RecipeSerializer<AnvilRecipe> {
         @Override
-        public Codec<AnvilRecipe> codec() {
-            return RecordCodecBuilder.create(instance -> instance.group(
-                    AAItemHelper.ITEMSTACK_WITH_NBT_CODEC.fieldOf("result").forGetter(recipe -> recipe.getResultItem(null)),
-                    CompleteInput.CODEC.listOf().fieldOf("inputs").forGetter(recipe -> {
-                        var inputs = new ArrayList<CompleteInput>();
+        public AnvilRecipe fromJson(ResourceLocation id, JsonObject json) {
+            var result = AACraftingHelper.getItemStack(GsonHelper.getAsJsonObject(json, "result"), true, true);
 
-                        for (var i = 0; i < recipe.getIngredients().size(); i++)
-                            inputs.add(new CompleteInput(recipe.getInput(i), recipe.getInputCount(i), recipe.getInputNbt(i), recipe.isNbtStrict(i), recipe.isConsuming(i), recipe.isUsingDurability(i), recipe.getReturn(i)));
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            NonNullList<ItemStack> returnItems = NonNullList.create();
+            NonNullList<CompoundTag> nbt = NonNullList.create();
+            NonNullList<Boolean> strictNbt = NonNullList.create();
+            NonNullList<Boolean> consume = NonNullList.create();
+            NonNullList<Boolean> useDurability = NonNullList.create();
+            NonNullList<Integer> count = NonNullList.create();
 
-                        return inputs;
-                    }),
-                    ExtraCodecs.strictOptionalField(Codec.BOOL, "shapeless", false).forGetter(AnvilRecipe::isShapeless),
-                    ExtraCodecs.strictOptionalField(Codec.INT, "experience", 0).forGetter(AnvilRecipe::getExperience)
-            ).apply(instance, (result, inputs, shapeless, experience) -> new AnvilRecipe(result, inputs.stream().map(CompleteInput::input).collect(Collectors.toCollection(NonNullList::create)), inputs.stream().map(CompleteInput::returnStack).collect(Collectors.toCollection(NonNullList::create)), inputs.stream().map(CompleteInput::nbt).toList(), inputs.stream().map(CompleteInput::strictNbt).toList(), inputs.stream().map(CompleteInput::consume).toList(), inputs.stream().map(CompleteInput::useDurability).toList(), inputs.stream().map(CompleteInput::count).toList(), shapeless, experience)));
+            for (var input : GsonHelper.getAsJsonArray(json, "inputs")) {
+                ingredients.add(Ingredient.fromJson(input));
+                returnItems.add(input.getAsJsonObject().has("return") ? AACraftingHelper.getItemStack(GsonHelper.getAsJsonObject(input.getAsJsonObject(), "return"), true, false) : ItemStack.EMPTY);
+                nbt.add(input.getAsJsonObject().has("nbt") ? AACraftingHelper.getNBT(input.getAsJsonObject().get("nbt")) : new CompoundTag());
+                strictNbt.add(GsonHelper.getAsBoolean(input.getAsJsonObject(), "strictNbt", false));
+                consume.add(GsonHelper.getAsBoolean(input.getAsJsonObject(), "consume", true));
+                useDurability.add(GsonHelper.getAsBoolean(input.getAsJsonObject(), "useDurability", false));
+                count.add(GsonHelper.getAsInt(input.getAsJsonObject(), "count", 1));
+            }
+
+            var shapeless = GsonHelper.getAsBoolean(json, "shapeless", false);
+            var experience = GsonHelper.getAsInt(json, "experience", 0);
+
+            return new AnvilRecipe(id, result, ingredients, returnItems, nbt, strictNbt, consume, useDurability, count, shapeless, experience);
         }
 
         @Nullable
         @Override
-        public AnvilRecipe fromNetwork(FriendlyByteBuf buffer) {
+        public AnvilRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
             var result = buffer.readItem();
 
             var inputsSize = buffer.readInt();
@@ -398,7 +416,7 @@ public class AnvilRecipe implements IAnvilRecipe {
             var shapeless = buffer.readBoolean();
             var experience = buffer.readInt();
 
-            return new AnvilRecipe(result, inputs, returns, nbt, strictNbt, consumes, useDurability, counts, shapeless, experience);
+            return new AnvilRecipe(id, result, inputs, returns, nbt, strictNbt, consumes, useDurability, counts, shapeless, experience);
         }
 
         @Override
@@ -443,23 +461,61 @@ public class AnvilRecipe implements IAnvilRecipe {
             buffer.writeBoolean(recipe.shapeless);
             buffer.writeInt(recipe.experience);
         }
+    }
 
-        private record CompleteInput(Ingredient input, int count, CompoundTag nbt, boolean strictNbt, boolean consume, boolean useDurability, ItemStack returnStack) {
-            public static final Codec<CompleteInput> CODEC = Codec.pair(Ingredient.CODEC_NONEMPTY, IncompleteInput.CODEC).xmap(
-                    codec -> new CompleteInput(codec.getFirst(), codec.getSecond().count, codec.getSecond().nbt, codec.getSecond().strictNbt, codec.getSecond().consume, codec.getSecond().useDurability, codec.getSecond().returnStack),
-                    complete -> Pair.of(complete.input, new IncompleteInput(complete.count, complete.nbt, complete.strictNbt, complete.consume, complete.useDurability, complete.returnStack))
-            );
+    @Getter
+    private class Result implements FinishedRecipe {
+        private final ResourceLocation id;
+        private final ResourceLocation advancementId;
 
-            private record IncompleteInput(int count, CompoundTag nbt, boolean strictNbt, boolean consume, boolean useDurability, ItemStack returnStack) {
-                private static final Codec<IncompleteInput> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        ExtraCodecs.strictOptionalField(Codec.INT, "count", 1).forGetter(IncompleteInput::count),
-                        TagParser.AS_CODEC.optionalFieldOf("nbt", new CompoundTag()).forGetter(IncompleteInput::nbt),
-                        ExtraCodecs.strictOptionalField(Codec.BOOL, "strictNbt", false).forGetter(IncompleteInput::strictNbt),
-                        ExtraCodecs.strictOptionalField(Codec.BOOL, "consume", true).forGetter(IncompleteInput::consume),
-                        ExtraCodecs.strictOptionalField(Codec.BOOL, "useDurability", false).forGetter(IncompleteInput::useDurability),
-                        AAItemHelper.ITEMSTACK_WITH_NBT_CODEC.optionalFieldOf("return", ItemStack.EMPTY).forGetter(IncompleteInput::returnStack)
-                ).apply(instance, IncompleteInput::new));
+        Result(ResourceLocation id) {
+            this.id = id;
+            this.advancementId = new ResourceLocation(id.getNamespace(), "recipes/" + id.getPath());
+        }
+
+        @Override
+        public void serializeRecipeData(JsonObject json) {
+            json.add("result", AAItemHelper.serialize(result));
+
+            var inputArray = new JsonArray();
+
+            for (var inputId = 0; inputId < inputs.size(); inputId++) {
+                var inputJson = inputs.get(inputId).toJson().getAsJsonObject();
+
+                if (!returns.get(inputId).isEmpty())
+                    inputJson.add("return", AAItemHelper.serialize(returns.get(inputId)));
+                if (!nbt.get(inputId).isEmpty())
+                    inputJson.addProperty("nbt", nbt.get(inputId).toString());
+                if (strictNbt.get(inputId))
+                    inputJson.addProperty("strictNbt", strictNbt.get(inputId));
+                if (!consumes.get(inputId))
+                    inputJson.addProperty("consume", consumes.get(inputId));
+                if (useDurability.get(inputId))
+                    inputJson.addProperty("useDurability", useDurability.get(inputId));
+                if (counts.get(inputId) != 1)
+                    inputJson.addProperty("count", counts.get(inputId));
+
+                inputArray.add(inputJson);
             }
+
+            json.add("inputs", inputArray);
+
+            if (shapeless)
+                json.addProperty("shapeless", true);
+
+            if (experience != 0)
+                json.addProperty("experience", experience);
+        }
+
+        @Override
+        public RecipeSerializer<AnvilRecipe> getType() {
+            return getSerializer();
+        }
+
+        @Nullable
+        @Override
+        public JsonObject serializeAdvancement() {
+            return advancementBuilder.serializeToJson();
         }
     }
 }

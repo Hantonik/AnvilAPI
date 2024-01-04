@@ -3,12 +3,16 @@
   "package": "hantonik.anvilapi.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MixinAnvilMenu"
+    "MixinAnvilMenu",
+
+    "MixinRecipeManager"
   ],
   "client": [
     "MixinAnvilScreen",
-    "MixinJEIVanillaPlugin",
 
+    "MixinClientPacketListener",
+
+    "MixinJEIVanillaPlugin",
     "accessors.AccessorJEIRecipeManager"
   ],
   "minVersion": "0.8"

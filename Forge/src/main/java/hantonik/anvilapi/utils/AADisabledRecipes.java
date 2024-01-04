@@ -2,10 +2,8 @@ package hantonik.anvilapi.utils;
 
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -162,7 +160,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                     if (baseItemJson.isJsonPrimitive())
                         baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                     else
-                        baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
+                        baseItem = Ingredient.fromJson(baseItemJson);
 
                     if (repairJson.getAsJsonObject().has("repairItem")) {
                         var repairItemJson = repairJson.getAsJsonObject().get("repairItem");
@@ -170,7 +168,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                         if (repairItemJson.isJsonPrimitive())
                             repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                         else
-                            repairItem = Util.getOrThrow(Ingredient.CODEC.parse(JsonOps.INSTANCE, repairJson.getAsJsonObject().get("repairItem")), IllegalStateException::new);
+                            repairItem = Ingredient.fromJson(repairJson.getAsJsonObject().get("repairItem"));
                     }
                 } else
                     baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairJson, "baseItem")));
@@ -192,7 +190,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 if (repairItemJson.isJsonPrimitive())
                     repairItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(repairItemJson, "repairItem")));
                 else
-                    repairItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, repairItemJson), IllegalStateException::new);
+                    repairItem = Ingredient.fromJson(repairItemJson);
 
                 for (var repairStack : repairItem.getItems())
                     AnvilAPI.LOGGER.debug("Disabling repair recipes with {}", ForgeRegistries.ITEMS.getKey(repairStack.getItem()));
@@ -230,7 +228,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                             if (baseItemJson.isJsonPrimitive())
                                 baseItem = Ingredient.of(new ItemStack(GsonHelper.convertToItem(baseItemJson, "baseItem")));
                             else
-                                baseItem = Util.getOrThrow(Ingredient.CODEC_NONEMPTY.parse(JsonOps.INSTANCE, baseItemJson), IllegalStateException::new);
+                                baseItem = Ingredient.fromJson(baseItemJson);
                         }
 
                         enchantment1 = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(GsonHelper.getAsString(enchantmentJson.getAsJsonObject(), "enchantment")));

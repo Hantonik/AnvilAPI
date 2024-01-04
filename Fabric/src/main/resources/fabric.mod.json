@@ -21,6 +21,9 @@
 		"main": [
 			"hantonik.anvilapi.AnvilAPI"
 		],
+		"client": [
+			"hantonik.anvilapi.AnvilAPIClient"
+		],
 
 		"jei_mod_plugin": [
 			"hantonik.anvilapi.integration.jei.JeiIntegration"
@@ -41,7 +44,7 @@
 	},
 
 	"mixins": [
-      "anvilapi.mixins.json"
+      	"anvilapi.mixins.json"
 	],
 	"accessWidener": "anvilapi.accesswidener"
 }

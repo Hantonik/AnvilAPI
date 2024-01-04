@@ -1,22 +1,23 @@
 package hantonik.anvilapi.recipe;
 
-import com.google.common.collect.Maps;
-import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.google.gson.JsonObject;
 import hantonik.anvilapi.api.recipe.IAnvilRepairRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
-import net.minecraft.advancements.AdvancementRequirements;
+import hantonik.anvilapi.utils.AAItemHelper;
+import lombok.Getter;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
-import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.RequirementsStrategy;
+import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -26,15 +27,17 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.function.Consumer;
 
 public class AnvilRepairRecipe implements IAnvilRepairRecipe {
-    private final Map<String, Criterion<?>> criteria = Maps.newLinkedHashMap();
+    private final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
 
+    private final ResourceLocation id;
     private final Item baseItem;
     private final Ingredient repairItem;
 
-    public AnvilRepairRecipe(Item baseItem, Ingredient repairItem) {
+    public AnvilRepairRecipe(ResourceLocation id, Item baseItem, Ingredient repairItem) {
+        this.id = id;
         this.baseItem = baseItem;
         this.repairItem = repairItem;
     }
@@ -47,6 +50,11 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
     @Override
     public Ingredient getRepairItem() {
         return this.repairItem;
+    }
+
+    @Override
+    public ResourceLocation getId() {
+        return this.id;
     }
 
     @Override
@@ -79,44 +87,74 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         return AARecipeSerializers.ANVIL_REPAIR;
     }
 
-    public AnvilRepairRecipe addCriterion(String name, Criterion<?> criterion) {
-        this.criteria.put(name, criterion);
+    public AnvilRepairRecipe addCriterion(String name, CriterionTriggerInstance criterion) {
+        this.advancementBuilder.addCriterion(name, criterion);
 
         return this;
     }
 
-    public void build(RecipeOutput output, ResourceLocation id) {
-        if (this.criteria.isEmpty())
+    public void build(Consumer<FinishedRecipe> output, ResourceLocation id) {
+        if (this.advancementBuilder.getCriteria().isEmpty())
             throw new IllegalStateException("No way of obtaining recipe " + id);
 
-        var advancementBuilder = output.advancement()
-                .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
-        output.accept(id, this, advancementBuilder.build(id.withPrefix("recipes/")));
+        this.advancementBuilder.parent(new ResourceLocation("recipes/root"))
+                .addCriterion("has_the_recipe", new RecipeUnlockedTrigger.TriggerInstance(EntityPredicate.Composite.ANY, id))
+                .rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
+        output.accept(new Result(id));
     }
 
     public static class Serializer implements RecipeSerializer<AnvilRepairRecipe> {
         @Override
-        public Codec<AnvilRepairRecipe> codec() {
-            return RecordCodecBuilder.create(instance -> instance.group(
-                    BuiltInRegistries.ITEM.byNameCodec().fieldOf("baseItem").forGetter(AnvilRepairRecipe::getBaseItem),
-                    ExtraCodecs.either(BuiltInRegistries.ITEM.byNameCodec(), Ingredient.CODEC_NONEMPTY).fieldOf("repairItem").forGetter(recipe -> Either.right(recipe.getRepairItem()))
-            ).apply(instance, (baseItem, resultItem) -> new AnvilRepairRecipe(baseItem, resultItem.right().isPresent() ? resultItem.right().orElseThrow() : Ingredient.of(resultItem.orThrow()))));
+        public AnvilRepairRecipe fromJson(ResourceLocation id, JsonObject json) {
+            var baseItem = GsonHelper.getAsItem(json, "baseItem");
+
+            var repairItemJson = json.get("repairItem");
+            var repairItem = repairItemJson.isJsonPrimitive() ? Ingredient.of(GsonHelper.convertToItem(repairItemJson, "repairItem")) : Ingredient.fromJson(repairItemJson);
+
+            return new AnvilRepairRecipe(id, baseItem, repairItem);
         }
 
         @Nullable
         @Override
-        public AnvilRepairRecipe fromNetwork(FriendlyByteBuf buffer) {
+        public AnvilRepairRecipe fromNetwork(ResourceLocation id, FriendlyByteBuf buffer) {
             var baseItem = BuiltInRegistries.ITEM.get(buffer.readResourceLocation());
             var repairItem = Ingredient.fromNetwork(buffer);
 
-            return new AnvilRepairRecipe(baseItem, repairItem);
+            return new AnvilRepairRecipe(id, baseItem, repairItem);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf buffer, AnvilRepairRecipe recipe) {
             buffer.writeResourceLocation(BuiltInRegistries.ITEM.getKey(recipe.getBaseItem()));
             recipe.getRepairItem().toNetwork(buffer);
+        }
+    }
+
+    @Getter
+    private class Result implements FinishedRecipe {
+        private final ResourceLocation id;
+        private final ResourceLocation advancementId;
+
+        Result(ResourceLocation id) {
+            this.id = id;
+            this.advancementId = new ResourceLocation(id.getNamespace(), "recipes/" + id.getPath());
+        }
+
+        @Override
+        public void serializeRecipeData(JsonObject json) {
+            json.add("baseItem", AAItemHelper.serialize(baseItem));
+            json.add("repairItem", repairItem.toJson());
+        }
+
+        @Override
+        public RecipeSerializer<AnvilRepairRecipe> getType() {
+            return getSerializer();
+        }
+
+        @Nullable
+        @Override
+        public JsonObject serializeAdvancement() {
+            return advancementBuilder.serializeToJson();
         }
     }
 }

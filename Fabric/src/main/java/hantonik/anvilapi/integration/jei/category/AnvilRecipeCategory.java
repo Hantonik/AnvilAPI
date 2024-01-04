@@ -1,5 +1,6 @@
 package hantonik.anvilapi.integration.jei.category;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.utils.AAItemHelper;
@@ -14,7 +15,6 @@ import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -59,25 +59,26 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
     }
 
     @Override
-    public void draw(IAnvilRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics graphics, double mouseX, double mouseY) {
+    public void draw(IAnvilRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
         var font = Minecraft.getInstance().font;
         var player = Minecraft.getInstance().player;
+        var renderer = Minecraft.getInstance().getItemRenderer();
 
-        graphics.drawString(font, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), 46, 17, 0xFFFFFFFF);
+        font.drawShadow(stack, Component.literal(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()).getHoverName().getString()), 46, 17, 0xFFFFFFFF);
 
         if (recipe.isShapeless())
-            this.shapeless.draw(graphics, 135, 62);
+            this.shapeless.draw(stack, 135, 62);
 
         if (!recipe.getReturns().stream().allMatch(ItemStack::isEmpty)) {
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, 0, 400);
+            stack.pushPose();
+            stack.translate(0, 0, 400);
 
             if (!recipe.getReturn(0).isEmpty()) {
                 if (mouseX > 9 && mouseX < 26 && mouseY > 39 && mouseY < 56) {
                     var item = recipe.getReturn(0);
 
-                    graphics.renderItem(item, (int) mouseX + 12, (int) mouseY + 20);
-                    graphics.renderItemDecorations(font, item, (int) mouseX + 12, (int) mouseY + 20);
+                    renderer.renderGuiItem(stack, item, (int) mouseX + 12, (int) mouseY + 30);
+                    renderer.renderGuiItemDecorations(stack, font, item, (int) mouseX + 12, (int) mouseY + 30);
                 }
             }
 
@@ -85,16 +86,16 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
                 if (mouseX > 58 && mouseX < 75 && mouseY > 39 && mouseY < 56) {
                     var item = recipe.getReturn(1);
 
-                    graphics.renderItem(item, (int) mouseX + 12, (int) mouseY + 20);
-                    graphics.renderItemDecorations(font, item, (int) mouseX + 12, (int) mouseY + 20);
+                    renderer.renderGuiItem(stack, item, (int) mouseX + 12, (int) mouseY + 30);
+                    renderer.renderGuiItemDecorations(stack, font, item, (int) mouseX + 12, (int) mouseY + 30);
                 }
             }
 
-            graphics.pose().popPose();
+            stack.popPose();
         }
 
         if (recipe.getExperience() > 0)
-            graphics.drawString(font, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, 65, (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
+            font.drawShadow(stack, Component.translatable("container.repair.cost", recipe.getExperience() < 0 ? "err" : String.valueOf(recipe.getExperience())).getString(), 9, 65, (player == null || player.isCreative()) || (recipe.getExperience() < 40 && recipe.getExperience() <= player.experienceLevel) ? 0xFF80FF20 : 0xFFFF6060);
     }
 
     @Override
@@ -108,7 +109,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, IAnvilRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()).addTooltipCallback(((slotView, tooltip) -> {
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()).addTooltipCallback(((slotView, tooltip) -> {
             tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
 
             if (recipe.isUsingDurability(0))
@@ -124,7 +125,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
             }
         }));
 
-        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList()).addTooltipCallback(((slotView, tooltip) -> {
+        builder.addSlot(RecipeIngredientRole.INPUT, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList()).addTooltipCallback(((slotView, tooltip) -> {
             tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
 
             if (recipe.isUsingDurability(1))
