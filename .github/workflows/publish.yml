@@ -10,7 +10,6 @@ permissions:
 jobs:
   publish:
     name: 'Publish'
-    needs: ['pre-publish']
     runs-on: ubuntu-latest
 
     steps:
