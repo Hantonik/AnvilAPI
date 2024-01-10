@@ -1,6 +1,10 @@
 name: 'Build'
 
-on: [push, workflow_call]
+on:
+  workflow_call:
+  push:
+    branches:
+      - '1.*'
 
 permissions:
   contents: read
