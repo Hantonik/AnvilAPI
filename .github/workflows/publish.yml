@@ -35,3 +35,6 @@ jobs:
 
       - name: 'Publish'
         run: ./gradlew publishMod
+        env:
+          CURSEFORGE_TOKEN: ${{secrets.CURSEFORGE_TOKEN}}
+          MODRINTH_TOKEN: ${{secrets.MODRINTH_TOKEN}}
