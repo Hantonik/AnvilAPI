@@ -14,18 +14,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: 'Set up JDK 17'
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'microsoft'
-          java-version: '17'
-          cache: 'gradle'
+      - uses: ./.github/actions/build.yml
 
       - name: 'Generate Changelog'
         run: ./gradlew makeChangelog
-
-      - uses: ./.github/actions/build
   publish:
     name: 'Publish'
     needs: ['pre-publish']
