@@ -30,4 +30,4 @@ jobs:
           distribution: 'temurin'
 
       - name: 'Build'
-        uses: /.github/workflows/build.yml
+        uses: Hantonik/AnvilAPI/.github/workflows/build.yml@feature/workflows
