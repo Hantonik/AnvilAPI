@@ -29,5 +29,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 'Build'
-        uses: Hantonik/AnvilAPI/.github/workflows/build.yml@feature/workflows
+      - name: 'Setup with Gradle'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: setup
+          cache-read-only: false
+
+      - name: 'Build with Gradle'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          cache-read-only: false
+
+      - name: 'Move artifacts'
+        shell: bash
+        run: |
+          mkdir artifacts
+          cp Fabric/build/libs/*.jar artifacts
+          cp Forge/build/libs/*.jar artifacts
+          cp NeoForge/build/libs/*.jar artifacts
+
+      - uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          path: artifacts/*
