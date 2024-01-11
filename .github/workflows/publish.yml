@@ -22,12 +22,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: 'Setup with Gradle'
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: setup
-          cache-read-only: false
-
       - name: 'Build with Gradle'
         uses: gradle/gradle-build-action@v2
         with:
