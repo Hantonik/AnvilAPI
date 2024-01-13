@@ -33,8 +33,6 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     private DataSlot cost;
     @Shadow
     private String itemName;
-    @Shadow
-    public int repairItemCountCost;
 
     public MixinAnvilMenu(@Nullable MenuType<?> type, int containerId, Inventory container, ContainerLevelAccess access) {
         super(type, containerId, container, access);
@@ -44,7 +42,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
     public abstract void createResult();
 
     @Inject(at = @At("HEAD"), method = "mayPickup", cancellable = true)
-    protected void mayPickup(Player player, boolean b, CallbackInfoReturnable<Boolean> callback) {
+    protected void mayPickup(Player player, boolean hasStack, CallbackInfoReturnable<Boolean> callback) {
         callback.setReturnValue(player.getAbilities().instabuild || player.experienceLevel >= this.cost.get());
 
         callback.cancel();
@@ -52,18 +50,16 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
 
     @Inject(at = @At("HEAD"), method = "onTake", cancellable = true)
     protected void onTake(Player player, ItemStack stack, CallbackInfo callback) {
-        callback.cancel();
-
-        if (!player.getAbilities().instabuild)
-            player.giveExperienceLevels(-this.cost.get());
-
-        this.cost.set(0);
-
-        var breakChance = ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
-
         var recipe = this.player.level().getRecipeManager().getRecipeFor(AARecipeTypes.ANVIL.get(), this.inputSlots, this.player.level()).map(RecipeHolder::value).orElse(null);
 
         if (recipe != null) {
+            if (!player.getAbilities().instabuild)
+                player.giveExperienceLevels(-this.cost.get());
+
+            this.cost.set(0);
+
+            var breakChance = ForgeHooks.onAnvilRepair(player, stack, this.inputSlots.getItem(0), this.inputSlots.getItem(1));
+
             var input1 = this.inputSlots.getItem(0);
             var input2 = this.inputSlots.getItem(1);
 
@@ -83,6 +79,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                     input1.hurtAndBreak(recipe.getInputCount(0), this.player, p -> this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0))));
                 else
                     input1.shrink(recipe.getInputCount(0));
+
+                if (input1.isEmpty())
+                    this.inputSlots.setItem(input1Slot, ItemStack.EMPTY);
             }
 
             if (!recipe.getReturn(0).isEmpty()) {
@@ -106,6 +105,9 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                     input2.hurtAndBreak(recipe.getInputCount(1), this.player, p -> this.access.execute(((level, pos) -> level.levelEvent(1029, pos, 0))));
                 else
                     input2.shrink(recipe.getInputCount(1));
+
+                if (input2.isEmpty())
+                    this.inputSlots.setItem(input2Slot, ItemStack.EMPTY);
             }
 
             if (!recipe.getReturn(1).isEmpty()) {
@@ -124,38 +126,28 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
             }
 
             this.createResult();
-        } else {
-            this.inputSlots.setItem(0, ItemStack.EMPTY);
 
-            if (this.repairItemCountCost > 0) {
-                ItemStack itemstack = this.inputSlots.getItem(1);
+            this.access.execute((level, pos) -> {
+                BlockState blockstate = level.getBlockState(pos);
 
-                if (!itemstack.isEmpty() && itemstack.getCount() > this.repairItemCountCost) {
-                    itemstack.shrink(this.repairItemCountCost);
+                if (!player.getAbilities().instabuild && blockstate.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
+                    BlockState state1 = AnvilBlock.damage(blockstate);
 
-                    this.inputSlots.setItem(1, itemstack);
+                    if (state1 == null) {
+                        level.removeBlock(pos, false);
+                        level.levelEvent(1029, pos, 0);
+                    } else {
+                        level.setBlock(pos, state1, 2);
+                        level.levelEvent(1030, pos, 0);
+                    }
                 } else
-                    this.inputSlots.setItem(1, ItemStack.EMPTY);
-            } else
-                this.inputSlots.setItem(1, ItemStack.EMPTY);
-        }
-        
-        this.access.execute((level, pos) -> {
-            BlockState blockstate = level.getBlockState(pos);
-
-            if (!player.getAbilities().instabuild && blockstate.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
-                BlockState state1 = AnvilBlock.damage(blockstate);
-
-                if (state1 == null) {
-                    level.removeBlock(pos, false);
-                    level.levelEvent(1029, pos, 0);
-                } else {
-                    level.setBlock(pos, state1, 2);
                     level.levelEvent(1030, pos, 0);
-                }
-            } else
-                level.levelEvent(1030, pos, 0);
-        });
+            });
+
+            this.inputSlots.setChanged();
+
+            callback.cancel();
+        }
     }
 
     @Inject(at = @At("HEAD"), method = "createResult", cancellable = true)
@@ -222,5 +214,20 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu {
                 }
             }
         }
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int slotIndex) {
+        if (slotIndex == AnvilMenu.RESULT_SLOT) {
+            if (this.slots.get(slotIndex).hasItem()) {
+                if (!this.mayPickup(player, true)) {
+                    this.resetQuickCraft();
+
+                    return ItemStack.EMPTY;
+                }
+            }
+        }
+
+        return super.quickMoveStack(player, slotIndex);
     }
 }

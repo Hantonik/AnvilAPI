@@ -4,13 +4,13 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "anvilapi.refmap.json",
   "mixins": [
+    "MixinAnvilMenu"
+  ],
+  "client": [
+    "MixinAnvilScreen",
     "MixinJEIVanillaPlugin",
 
     "accessors.AccessorJEIRecipeManager"
-  ],
-  "client": [
-    "MixinAnvilMenu",
-    "MixinAnvilScreen"
   ],
   "minVersion": "0.8"
 }

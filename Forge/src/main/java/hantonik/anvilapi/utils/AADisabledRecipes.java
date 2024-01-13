@@ -15,6 +15,8 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -93,6 +95,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
         return ENCHANTMENT_COMBINING.stream().anyMatch(entry -> (entry.getFirst().getFirst() == enchantment1 && (entry.getFirst().getSecond() == -1 || entry.getFirst().getSecond() == enchantment1Level) && entry.getSecond().getFirst() == enchantment2 && (entry.getSecond().getSecond() == -1 || entry.getSecond().getSecond() == enchantment2Level)) || (entry.getFirst().getFirst() == enchantment2 && (entry.getFirst().getSecond() == -1 || entry.getFirst().getSecond() == enchantment2Level) && entry.getSecond().getFirst() == enchantment1 && (entry.getSecond().getSecond() == -1 || entry.getSecond().getSecond() == enchantment1Level)));
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
         if (isRepairItemDisabled(repairCandidate) || isRepairDisabled(stack, repairCandidate))
             return false;

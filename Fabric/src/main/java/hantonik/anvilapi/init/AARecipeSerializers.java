@@ -1,7 +1,5 @@
 package hantonik.anvilapi.init;
 
-import hantonik.anvilapi.api.recipe.IAnvilRecipe;
-import hantonik.anvilapi.api.recipe.IAnvilRepairRecipe;
 import hantonik.anvilapi.recipe.AnvilRecipe;
 import hantonik.anvilapi.recipe.AnvilRepairRecipe;
 import lombok.AccessLevel;
@@ -13,8 +11,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AARecipeSerializers {
-    public static final RecipeSerializer<IAnvilRecipe> ANVIL = new AnvilRecipe.Serializer();
-    public static final RecipeSerializer<IAnvilRepairRecipe> ANVIL_REPAIR = new AnvilRepairRecipe.Serializer();
+    public static final RecipeSerializer<AnvilRecipe> ANVIL = new AnvilRecipe.Serializer();
+    public static final RecipeSerializer<AnvilRepairRecipe> ANVIL_REPAIR = new AnvilRepairRecipe.Serializer();
 
     public static void onInit() {
         Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation("anvil"), ANVIL);

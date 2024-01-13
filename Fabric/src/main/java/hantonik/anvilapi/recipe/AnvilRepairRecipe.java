@@ -1,23 +1,18 @@
 package hantonik.anvilapi.recipe;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import hantonik.anvilapi.api.recipe.IAnvilRepairRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.anvilapi.utils.AAItemHelper;
-import lombok.Getter;
-import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -34,16 +29,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 
 public class AnvilRepairRecipe implements IAnvilRepairRecipe {
-    private final ResourceLocation serializerName;
-
     private final Map<String, Criterion<?>> criteria = Maps.newLinkedHashMap();
 
     private final Item baseItem;
     private final Ingredient repairItem;
 
     public AnvilRepairRecipe(Item baseItem, Ingredient repairItem) {
-        this.serializerName = new ResourceLocation("anvil_repair");
-
         this.baseItem = baseItem;
         this.repairItem = repairItem;
     }
@@ -84,7 +75,7 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
     }
 
     @Override
-    public RecipeSerializer<IAnvilRepairRecipe> getSerializer() {
+    public RecipeSerializer<AnvilRepairRecipe> getSerializer() {
         return AARecipeSerializers.ANVIL_REPAIR;
     }
 
@@ -101,21 +92,21 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         var advancementBuilder = output.advancement()
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
                 .rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
-        output.accept(new Result(id, advancementBuilder.build(id.withPrefix("recipes/"))));
+        output.accept(id, this, advancementBuilder.build(id.withPrefix("recipes/")));
     }
 
-    public static class Serializer implements RecipeSerializer<IAnvilRepairRecipe> {
+    public static class Serializer implements RecipeSerializer<AnvilRepairRecipe> {
         @Override
-        public Codec<IAnvilRepairRecipe> codec() {
+        public Codec<AnvilRepairRecipe> codec() {
             return RecordCodecBuilder.create(instance -> instance.group(
-                    BuiltInRegistries.ITEM.byNameCodec().fieldOf("baseItem").forGetter(IAnvilRepairRecipe::getBaseItem),
+                    BuiltInRegistries.ITEM.byNameCodec().fieldOf("baseItem").forGetter(AnvilRepairRecipe::getBaseItem),
                     ExtraCodecs.either(BuiltInRegistries.ITEM.byNameCodec(), Ingredient.CODEC_NONEMPTY).fieldOf("repairItem").forGetter(recipe -> Either.right(recipe.getRepairItem()))
-            ).apply(instance, (baseItem, resultItem) -> new AnvilRepairRecipe(baseItem, resultItem.right().isPresent() ? resultItem.right().orElseThrow() : Ingredient.of(resultItem.orThrow()))));
+            ).apply(instance, (baseItem, repairItem) -> new AnvilRepairRecipe(baseItem, repairItem.right().isPresent() ? repairItem.right().orElseThrow() : Ingredient.of(repairItem.orThrow()))));
         }
 
         @Nullable
         @Override
-        public IAnvilRepairRecipe fromNetwork(FriendlyByteBuf buffer) {
+        public AnvilRepairRecipe fromNetwork(FriendlyByteBuf buffer) {
             var baseItem = BuiltInRegistries.ITEM.get(buffer.readResourceLocation());
             var repairItem = Ingredient.fromNetwork(buffer);
 
@@ -123,53 +114,9 @@ public class AnvilRepairRecipe implements IAnvilRepairRecipe {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buffer, IAnvilRepairRecipe recipe) {
+        public void toNetwork(FriendlyByteBuf buffer, AnvilRepairRecipe recipe) {
             buffer.writeResourceLocation(BuiltInRegistries.ITEM.getKey(recipe.getBaseItem()));
             recipe.getRepairItem().toNetwork(buffer);
-        }
-    }
-
-    @Getter
-    private class Result implements FinishedRecipe {
-        private final ResourceLocation id;
-        private final AdvancementHolder advancement;
-
-        Result(ResourceLocation id, AdvancementHolder advancement) {
-            this.id = id;
-            this.advancement = advancement;
-        }
-
-        @Override
-        public ResourceLocation id() {
-            return this.id;
-        }
-
-        @Nullable
-        @Override
-        public AdvancementHolder advancement() {
-            return this.advancement;
-        }
-
-        @Override
-        public RecipeSerializer<IAnvilRepairRecipe> type() {
-            return AARecipeSerializers.ANVIL_REPAIR;
-        }
-
-        @Override
-        public JsonObject serializeRecipe() {
-            var json = new JsonObject();
-
-            json.addProperty("type", serializerName.toString());
-
-            this.serializeRecipeData(json);
-
-            return json;
-        }
-
-        @Override
-        public void serializeRecipeData(JsonObject json) {
-            json.add("baseItem", AAItemHelper.serialize(baseItem));
-            json.add("repairItem", repairItem.toJson(false));
         }
     }
 }

@@ -1,8 +1,8 @@
 {
   "pack": {
     "description": {
-      "text": "AnvilAPI resources"
+      "text": "${mod_name} resources"
     },
-    "pack_format": 18
+    "pack_format": 22
   }
 }

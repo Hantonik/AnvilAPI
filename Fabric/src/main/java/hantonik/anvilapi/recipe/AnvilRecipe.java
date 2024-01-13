@@ -1,27 +1,20 @@
 package hantonik.anvilapi.recipe;
 
 import com.google.common.collect.Maps;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import hantonik.anvilapi.api.recipe.IAnvilRecipe;
 import hantonik.anvilapi.init.AARecipeSerializers;
 import hantonik.anvilapi.init.AARecipeTypes;
-import hantonik.anvilapi.utils.AACraftingHelper;
 import hantonik.anvilapi.utils.AAItemHelper;
-import lombok.Getter;
 import net.minecraft.Util;
-import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -44,8 +37,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AnvilRecipe implements IAnvilRecipe {
-    private final ResourceLocation serializerName;
-
     private final Map<String, Criterion<?>> criteria = Maps.newLinkedHashMap();
 
     private final ItemStack result;
@@ -93,8 +84,6 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     protected AnvilRecipe(ItemStack result, NonNullList<Ingredient> inputs, NonNullList<ItemStack> returns, List<CompoundTag> nbt, List<Boolean> strictNbt, List<Boolean> consumes, List<Boolean> useDurability, List<Integer> counts, boolean shapeless, int experience) {
-        this.serializerName = new ResourceLocation("anvil");
-
         this.result = result;
         this.inputs = inputs;
         this.returns = returns;
@@ -321,7 +310,7 @@ public class AnvilRecipe implements IAnvilRecipe {
     }
 
     @Override
-    public RecipeSerializer<IAnvilRecipe> getSerializer() {
+    public RecipeSerializer<AnvilRecipe> getSerializer() {
         return AARecipeSerializers.ANVIL;
     }
 
@@ -338,14 +327,14 @@ public class AnvilRecipe implements IAnvilRecipe {
         var advancementBuilder = output.advancement()
                 .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
                 .rewards(AdvancementRewards.Builder.recipe(id)).requirements(AdvancementRequirements.Strategy.OR);
-        output.accept(new Result(id, advancementBuilder.build(id.withPrefix("recipes/"))));
+        output.accept(id, this, advancementBuilder.build(id.withPrefix("recipes/")));
     }
 
-    public static class Serializer implements RecipeSerializer<IAnvilRecipe> {
+    public static class Serializer implements RecipeSerializer<AnvilRecipe> {
         @Override
-        public Codec<IAnvilRecipe> codec() {
+        public Codec<AnvilRecipe> codec() {
             return RecordCodecBuilder.create(instance -> instance.group(
-                    AACraftingHelper.ITEMSTACK_WITH_NBT_CODEC.fieldOf("result").forGetter(recipe -> recipe.getResultItem(null)),
+                    AAItemHelper.ITEMSTACK_WITH_NBT_CODEC.fieldOf("result").forGetter(recipe -> recipe.getResultItem(null)),
                     CompleteInput.CODEC.listOf().fieldOf("inputs").forGetter(recipe -> {
                         var inputs = new ArrayList<CompleteInput>();
 
@@ -354,14 +343,14 @@ public class AnvilRecipe implements IAnvilRecipe {
 
                         return inputs;
                     }),
-                    ExtraCodecs.strictOptionalField(Codec.BOOL, "shapeless", false).forGetter(IAnvilRecipe::isShapeless),
-                    ExtraCodecs.strictOptionalField(Codec.INT, "experience", 0).forGetter(IAnvilRecipe::getExperience)
+                    ExtraCodecs.strictOptionalField(Codec.BOOL, "shapeless", false).forGetter(AnvilRecipe::isShapeless),
+                    ExtraCodecs.strictOptionalField(Codec.INT, "experience", 0).forGetter(AnvilRecipe::getExperience)
             ).apply(instance, (result, inputs, shapeless, experience) -> new AnvilRecipe(result, inputs.stream().map(CompleteInput::input).collect(Collectors.toCollection(NonNullList::create)), inputs.stream().map(CompleteInput::returnStack).collect(Collectors.toCollection(NonNullList::create)), inputs.stream().map(CompleteInput::nbt).toList(), inputs.stream().map(CompleteInput::strictNbt).toList(), inputs.stream().map(CompleteInput::consume).toList(), inputs.stream().map(CompleteInput::useDurability).toList(), inputs.stream().map(CompleteInput::count).toList(), shapeless, experience)));
         }
 
         @Nullable
         @Override
-        public IAnvilRecipe fromNetwork(FriendlyByteBuf buffer) {
+        public AnvilRecipe fromNetwork(FriendlyByteBuf buffer) {
             var result = buffer.readItem();
 
             var inputsSize = buffer.readInt();
@@ -413,46 +402,46 @@ public class AnvilRecipe implements IAnvilRecipe {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf buffer, IAnvilRecipe recipe) {
-            buffer.writeItem(recipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
+        public void toNetwork(FriendlyByteBuf buffer, AnvilRecipe recipe) {
+            buffer.writeItem(recipe.result);
 
-            buffer.writeInt(recipe.getIngredients().size());
+            buffer.writeInt(recipe.inputs.size());
 
-            for (var input : recipe.getIngredients())
+            for (var input : recipe.inputs)
                 input.toNetwork(buffer);
 
-            buffer.writeInt(recipe.getReturns().size());
+            buffer.writeInt(recipe.returns.size());
 
-            for (var ret : recipe.getReturns())
+            for (var ret : recipe.returns)
                 buffer.writeItem(ret);
 
-            buffer.writeInt(recipe.getAllNbt().size());
+            buffer.writeInt(recipe.nbt.size());
 
-            for (var nbt : recipe.getAllNbt())
+            for (var nbt : recipe.nbt)
                 buffer.writeNbt(nbt);
 
-            buffer.writeInt(recipe.getStrictNbt().size());
+            buffer.writeInt(recipe.strictNbt.size());
 
-            for (var strictNbt : recipe.getStrictNbt())
+            for (var strictNbt : recipe.strictNbt)
                 buffer.writeBoolean(strictNbt);
 
-            buffer.writeInt(recipe.getConsumes().size());
+            buffer.writeInt(recipe.consumes.size());
 
-            for (var consume : recipe.getConsumes())
+            for (var consume : recipe.consumes)
                 buffer.writeBoolean(consume);
 
-            buffer.writeInt(recipe.getUseDurability().size());
+            buffer.writeInt(recipe.useDurability.size());
 
-            for (var useDurability : recipe.getUseDurability())
+            for (var useDurability : recipe.useDurability)
                 buffer.writeBoolean(useDurability);
 
-            buffer.writeInt(recipe.getCounts().size());
+            buffer.writeInt(recipe.counts.size());
 
-            for (var count : recipe.getCounts())
+            for (var count : recipe.counts)
                 buffer.writeInt(count);
 
-            buffer.writeBoolean(recipe.isShapeless());
-            buffer.writeInt(recipe.getExperience());
+            buffer.writeBoolean(recipe.shapeless);
+            buffer.writeInt(recipe.experience);
         }
 
         private record CompleteInput(Ingredient input, int count, CompoundTag nbt, boolean strictNbt, boolean consume, boolean useDurability, ItemStack returnStack) {
@@ -468,80 +457,9 @@ public class AnvilRecipe implements IAnvilRecipe {
                         ExtraCodecs.strictOptionalField(Codec.BOOL, "strictNbt", false).forGetter(IncompleteInput::strictNbt),
                         ExtraCodecs.strictOptionalField(Codec.BOOL, "consume", true).forGetter(IncompleteInput::consume),
                         ExtraCodecs.strictOptionalField(Codec.BOOL, "useDurability", false).forGetter(IncompleteInput::useDurability),
-                        AACraftingHelper.ITEMSTACK_WITH_NBT_CODEC.optionalFieldOf("return", ItemStack.EMPTY).forGetter(IncompleteInput::returnStack)
+                        AAItemHelper.ITEMSTACK_WITH_NBT_CODEC.optionalFieldOf("return", ItemStack.EMPTY).forGetter(IncompleteInput::returnStack)
                 ).apply(instance, IncompleteInput::new));
             }
-        }
-    }
-
-    @Getter
-    private class Result implements FinishedRecipe {
-        private final ResourceLocation id;
-        private final AdvancementHolder advancement;
-
-        Result(ResourceLocation id, AdvancementHolder advancement) {
-            this.id = id;
-            this.advancement = advancement;
-        }
-
-        @Override
-        public ResourceLocation id() {
-            return this.id;
-        }
-
-        @Nullable
-        @Override
-        public AdvancementHolder advancement() {
-            return this.advancement;
-        }
-
-        @Override
-        public RecipeSerializer<IAnvilRecipe> type() {
-            return AARecipeSerializers.ANVIL;
-        }
-
-        @Override
-        public JsonObject serializeRecipe() {
-            var json = new JsonObject();
-
-            json.addProperty("type", serializerName.toString());
-
-            this.serializeRecipeData(json);
-
-            return json;
-        }
-
-        @Override
-        public void serializeRecipeData(JsonObject json) {
-            var inputsJson = new JsonArray();
-
-            for (var inputId = 0; inputId < inputs.size(); inputId++) {
-                var inputJson = inputs.get(inputId).toJson(false).getAsJsonObject();
-
-                if (counts.get(inputId) != 1)
-                    inputJson.addProperty("count", counts.get(inputId));
-                if (!nbt.get(inputId).isEmpty())
-                    inputJson.addProperty("nbt", nbt.get(inputId).toString());
-                if (strictNbt.get(inputId))
-                    inputJson.addProperty("strictNbt", strictNbt.get(inputId));
-                if (!consumes.get(inputId))
-                    inputJson.addProperty("consume", consumes.get(inputId));
-                if (useDurability.get(inputId))
-                    inputJson.addProperty("useDurability", useDurability.get(inputId));
-                if (!returns.get(inputId).isEmpty())
-                    inputJson.add("return", AAItemHelper.serialize(returns.get(inputId)));
-
-                inputsJson.add(inputJson);
-            }
-
-            json.add("inputs", inputsJson);
-            json.add("result", AAItemHelper.serialize(result));
-
-            if (shapeless)
-                json.addProperty("shapeless", true);
-
-            if (experience != 0)
-                json.addProperty("experience", experience);
         }
     }
 }

@@ -15,15 +15,15 @@ issueTrackerURL="https://github.com/Hantonik/AnvilAPI/issues"
 
 [[dependencies.anvilapi]]
     modId="neoforge"
-    mandatory=true
-    versionRange="[20.2,)"
+    type="required"
+    versionRange="[20.4,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.anvilapi]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[1.20.2,1.21)"
+    type="required"
+    versionRange="[1.20.4,1.21)"
     ordering="NONE"
     side="BOTH"
 

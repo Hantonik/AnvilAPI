@@ -45,4 +45,5 @@ replay_*.log
 /Forge/run/
 /NeoForge/run/
 /Fabric/run/
-/Changelog/
+/Changelog/changelog.html
+/Changelog/changelog.md
