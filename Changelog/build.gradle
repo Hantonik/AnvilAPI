@@ -1,17 +1,16 @@
-import se.bjurr.gitchangelog.api.InclusivenessStrategy
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 
 plugins {
     id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.+'
 }
 
+var tag = 'git tag'.execute().text.split('\n').reverse()[1]
+
 tasks.register('makeHtmlChangelog', GitChangelogTask) {
     fromRepo = projectDir.absolutePath.toString()
     file = file('changelog.html')
 
-    fromRevisionStrategy = InclusivenessStrategy.INCLUSIVE
-
-    fromRevision = "git rev-list ${'git describe --tags --abbrev=0'.execute().text.trim()}..HEAD --reverse".execute().text.split('\n').first().trim()
+    fromRevision = tag
     toRevision = 'HEAD'
 
     templateContent = file('templates/changelog-html.mustache').getText()
@@ -21,9 +20,7 @@ tasks.register('makeMarkdownChangelog', GitChangelogTask) {
     fromRepo = projectDir.absolutePath.toString()
     file = file('changelog.md')
 
-    fromRevisionStrategy = InclusivenessStrategy.INCLUSIVE
-
-    fromRevision = "git rev-list ${'git describe --tags --abbrev=0'.execute().text.trim()}..HEAD --reverse".execute().text.split('\n').first().trim()
+    fromRevision = tag
     toRevision = 'HEAD'
 
     templateContent = file('templates/changelog-markdown.mustache').getText()
