@@ -22,7 +22,7 @@ subprojects {
 
     tasks.withType(ProcessResources).configureEach {
         var replaceProperties = [
-                'mod_version': gradleutils.version.toString(),
+                'mod_version': version,
                 'mod_name': mod_name,
 
                 'mc_version': mc_version,
