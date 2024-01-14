@@ -9,7 +9,6 @@ apply from: 'buildtools/ColoredOutput.gradle'
 
 gradleutils.version {
     tags {
-        label = 'beta'
         appendCommitOffset = false
     }
 }
