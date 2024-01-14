@@ -7,12 +7,9 @@ import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -20,6 +17,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -84,12 +82,9 @@ public final class AADisabledRecipes {
         return ENCHANTMENT_COMBINING.stream().anyMatch(entry -> (entry.getFirst().getFirst() == enchantment1 && (entry.getFirst().getSecond() == -1 || entry.getFirst().getSecond() == enchantment1Level) && entry.getSecond().getFirst() == enchantment2 && (entry.getSecond().getSecond() == -1 || entry.getSecond().getSecond() == enchantment2Level)) || (entry.getFirst().getFirst() == enchantment2 && (entry.getFirst().getSecond() == -1 || entry.getFirst().getSecond() == enchantment2Level) && entry.getSecond().getFirst() == enchantment1 && (entry.getSecond().getSecond() == -1 || entry.getSecond().getSecond() == enchantment1Level)));
     }
 
-    @Environment(EnvType.CLIENT)
-    public static boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
+    public static boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate, Level level) {
         if (isRepairItemDisabled(repairCandidate) || isRepairDisabled(stack, repairCandidate))
             return false;
-
-        var level = Minecraft.getInstance().level;
 
         if (level != null) {
             var container = new SimpleContainer(2);
