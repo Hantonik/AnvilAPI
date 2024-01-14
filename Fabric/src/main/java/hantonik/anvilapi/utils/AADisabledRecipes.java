@@ -95,7 +95,7 @@ public final class AADisabledRecipes {
                 return true;
         }
 
-        return stack.getItem().isValidRepairItem(stack, repairCandidate);
+        return stack.getItem().isValidRepairItem(stack, repairCandidate) || stack.isDamageableItem() && repairCandidate.isDamageableItem() && stack.sameItem(repairCandidate);
     }
 
     private static void reload() {

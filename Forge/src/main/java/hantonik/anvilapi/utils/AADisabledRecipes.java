@@ -104,7 +104,7 @@ public final class AADisabledRecipes implements ResourceManagerReloadListener {
                 return true;
         }
 
-        return stack.getItem().isValidRepairItem(stack, repairCandidate);
+        return stack.getItem().isValidRepairItem(stack, repairCandidate) || stack.isDamageableItem() && repairCandidate.isDamageableItem() && stack.sameItem(repairCandidate);
     }
 
     @Override
