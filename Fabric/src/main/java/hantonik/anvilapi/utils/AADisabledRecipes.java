@@ -105,7 +105,7 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStar
                 return true;
         }
 
-        return stack.getItem().isValidRepairItem(stack, repairCandidate);
+        return stack.getItem().isValidRepairItem(stack, repairCandidate) || stack.isDamageableItem() && repairCandidate.isDamageableItem() && stack.is(repairCandidate.getItem());
     }
 
     public void reload() {
