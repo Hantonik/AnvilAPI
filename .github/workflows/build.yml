@@ -42,7 +42,8 @@ jobs:
           cp Forge/build/libs/*.jar artifacts
           cp NeoForge/build/libs/*.jar artifacts
 
-      - uses: actions/upload-artifact@v3
+      - name: 'Upload artifact'
+        uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           path: artifacts/*
