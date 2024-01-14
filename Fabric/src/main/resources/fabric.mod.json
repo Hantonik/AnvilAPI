@@ -1,0 +1,50 @@
+{
+	"schemaVersion": 1,
+	"id": "anvilapi",
+	"version": "${mod_version}",
+
+	"name": "${mod_name}",
+	"description": "AnvilAPI adds to the game the ability to create custom anvil recipes by datapacks.",
+	"icon": "logo.png",
+	"license": "MIT",
+	"authors": [
+		"Hantonik"
+	],
+	"contact": {
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
+		"sources": "https://github.com/Hantonik/AnvilAPI",
+		"issues": "https://github.com/Hantonik/AnvilAPI/issues"
+	},
+
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"hantonik.anvilapi.AnvilAPI"
+		],
+		"client": [
+			"hantonik.anvilapi.AnvilAPIClient"
+		],
+
+		"jei_mod_plugin": [
+			"hantonik.anvilapi.integration.jei.JeiIntegration"
+		],
+
+		"rei_client": [
+			"hantonik.anvilapi.integration.rei.ReiClientPlugin"
+		],
+		"rei_common": [
+			"hantonik.anvilapi.integration.rei.ReiCommonPlugin"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.14.0",
+		"fabric-api": ">=0.66.0",
+		"minecraft": "~${mc_version}",
+		"java": ">=17"
+	},
+
+	"mixins": [
+      	"anvilapi.mixins.json"
+	],
+	"accessWidener": "anvilapi.accesswidener"
+}

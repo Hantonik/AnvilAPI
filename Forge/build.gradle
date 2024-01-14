@@ -1,0 +1,175 @@
+import com.modrinth.minotaur.dependencies.DependencyType
+import com.modrinth.minotaur.dependencies.ModDependency
+import net.darkhax.curseforgegradle.Constants as CFConstants
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
+plugins {
+    id 'net.minecraftforge.gradle' version '6.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'io.freefair.lombok' version '6.6.+'
+
+    id 'idea'
+    id 'maven-publish'
+}
+
+apply plugin: 'net.darkhax.curseforgegradle'
+apply plugin: 'com.modrinth.minotaur'
+
+base {
+    archivesName = "$mod_name-$mc_version-forge"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+
+    config "${mod_id}.mixins.json"
+}
+
+println "Using Forge: $forge_version, for Minecraft: $mc_version, with Mappings: $mappings_channel-$mappings_version"
+
+minecraft {
+    mappings channel: mappings_channel, version: "$mappings_version-$mc_version"
+
+    copyIdeResources = true
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        configureEach {
+            workingDirectory file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
+
+            ideaModule "${rootProject.name}.${project.name}.main"
+        }
+
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        server {
+            property 'forge.enabledGameTestNamespaces', mod_id
+
+            args '--nogui'
+        }
+    }
+}
+
+sourceSets.each {
+    var dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory = dir
+}
+
+repositories {
+    maven { url 'https://maven.blamejared.com' }
+    maven { url 'https://maven.shedaniel.me' }
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
+
+    compileOnly fg.deobf("mezz.jei:jei-$mc_version-common-api:$jei_version")
+    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge-api:$jei_version")
+    implementation fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
+
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version")
+    compileOnly fg.deobf("me.shedaniel:RoughlyEnoughItems-forge:$rei_version")
+
+    compileOnly fg.deobf("me.shedaniel.cloth:cloth-config-forge:$clothconfig_version")
+    compileOnly fg.deobf("dev.architectury:architectury-forge:$architectury_version")
+
+    implementation fg.deobf("com.blamejared.crafttweaker:CraftTweaker-forge-$mc_version:$crafttweaker_version")
+
+    compileOnly "org.projectlombok:lombok:$lombok_version"
+
+    annotationProcessor "org.spongepowered:mixin:$mixin_processor_version:processor"
+    annotationProcessor "org.projectlombok:lombok:$lombok_version"
+}
+
+jar.finalizedBy('reobfJar')
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}
+
+project.evaluationDependsOn(':Changelog')
+
+tasks.register('publishCurseForge', TaskPublishCurseForge) {
+    dependsOn(tasks.jar)
+    dependsOn(':Changelog:makeHtmlChangelog')
+
+    apiToken = System.getenv('CURSEFORGE_TOKEN')
+
+    var modFile = upload('634377', tasks.jar.archiveFile)
+    modFile.displayName = "${base.archivesName.get()}-$version"
+    modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
+    modFile.addGameVersion mc_version
+    modFile.addModLoader('Forge')
+    modFile.addJavaVersion 'Java 17'
+    modFile.addOptional('crafttweaker', 'roughly-enough-items', 'jei')
+
+    modFile.changelogType = CFConstants.CHANGELOG_HTML
+    modFile.changelog = file("${project(':Changelog').projectDir}/changelog.html").getText().replace([ '${version}': "$mc_version-$version" ])
+}
+
+modrinth {
+    token = System.getenv('MODRINTH_TOKEN')
+
+    projectId = mod_id
+
+    versionName = "${base.archivesName.get()}-$version"
+    versionNumber = version
+    versionType = 'release'
+
+    gameVersions = [ mc_version ]
+    loaders = [ 'forge' ]
+
+    dependencies = [
+            new ModDependency('Xg35A4rS', DependencyType.OPTIONAL),
+            new ModDependency('nfn13YXA', DependencyType.OPTIONAL),
+            new ModDependency('u6dRKJwZ', DependencyType.OPTIONAL)
+    ]
+
+    changelog = provider { file("${project(':Changelog').projectDir}/changelog.md").getText().replace([ '${version}': "$mc_version-$version" ]) }
+
+    uploadFile = tasks.jar
+    additionalFiles = [ tasks.sourcesJar ]
+}
+
+tasks.modrinth.dependsOn(tasks.jar)
+tasks.modrinth.dependsOn(tasks.sourcesJar)
+
+tasks.modrinth.dependsOn(':Changelog:makeMarkdownChangelog')
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+
+            artifactId archivesBaseName
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
+}

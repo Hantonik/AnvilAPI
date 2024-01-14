@@ -1,0 +1,47 @@
+name: 'Publish'
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  publish:
+    name: 'Publish'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+          fetch-tags: true
+
+      - name: 'Set up JDK 17'
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 'Build with Gradle'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+          cache-read-only: false
+
+      - name: 'Generate changelog with Gradle'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: makeChangelog
+          cache-read-only: false
+
+      - name: 'Publish mod with Gradle'
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishMod
+          cache-read-only: false
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

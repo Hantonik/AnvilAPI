@@ -1,169 +1,61 @@
 plugins {
-    id 'net.minecraftforge.gradle' version '5.1.+'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
-    id 'io.freefair.lombok' version '6.6.+'
+    id 'net.darkhax.curseforgegradle' version '1.0.+' apply false
+    id 'com.modrinth.minotaur' version '2.+' apply false
 
-    id 'idea'
-    id 'maven-publish'
+    id 'net.neoforged.gradleutils' version '3.+'
 }
 
-file('gradle.properties').withReader {
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
+apply from: 'buildtools/ColoredOutput.gradle'
+
+gradleutils.version {
+    tags {
+        appendCommitOffset = false
+    }
 }
 
-version = "$mod_version"
-group = "hantonik.$mod_id"
-archivesBaseName = "$mod_name-$mc_version"
+println "Starting build of $mod_name, Version: ${gradleutils.version.toString()}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+subprojects {
+    version = gradleutils.version.toString()
+    group = "hantonik.$mod_id"
 
-mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
+    tasks.withType(ProcessResources).configureEach {
+        var replaceProperties = [
+                'mod_version': version,
+                'mod_name': mod_name,
 
-    config "${mod_id}.mixins.json"
-}
+                'mc_version': mc_version,
 
-println "\nStarting build of $mod_name, Version: $mod_version"
-println "Using Forge: $forge_version, for Minecraft: $mc_version, with Mappings: $mappings_version-$mappings_channel\n"
+                'loader_version': loader_version,
+                'fabric_version': fabric_version
+        ]
 
-minecraft {
-    mappings channel: "$mappings_channel", version: "$mappings_version"
+        inputs.properties replaceProperties
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+	    filesMatching([ 'META-INF/mods.toml', 'fabric.mod.json', 'pack.mcmeta' ]) {
+	    	expand replaceProperties
+	    }
+    }
 
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', "$mod_id"
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
-
-            ideaModule "${project.name}.main"
-
-            mods {
-                anvilapi {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', "$mod_id"
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "$buildDir/createSrgToMcp/output.srg"
-
-            ideaModule "${project.name}.main"
-
-            mods {
-                anvilapi {
-                    source sourceSets.main
-                }
-            }
+    tasks.withType(Jar).configureEach {
+        manifest {
+            attributes([
+                    'Specification-Title': mod_id,
+                    'Specification-Vendor': 'Hantonik',
+                    'Specification-Version': '1',
+                    'Implementation-Title': project.name,
+                    'Implementation-Version': jar.archiveVersion,
+                    'Implementation-Vendor': 'Hantonik'
+            ])
         }
     }
-}
 
-repositories {
-    maven { url 'https://maven.blamejared.com' }
-
-    mavenCentral()
-}
-
-dependencies {
-    minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
-
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-common-api:$jei_version")
-    compileOnly fg.deobf("mezz.jei:jei-$mc_version-forge-api:$jei_version")
-    implementation fg.deobf("mezz.jei:jei-$mc_version-forge:$jei_version")
-
-    compileOnly "org.projectlombok:lombok:$lombok_version"
-
-    annotationProcessor "org.spongepowered:mixin:$mixin_processor_version:processor"
-    annotationProcessor "org.projectlombok:lombok:$lombok_version"
-
-}
-
-task replaceResources(type: Copy) {
-    outputs.upToDateWhen { false }
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-
-        expand  'mod_version': "$version",
-                'mod_name': "$mod_name"
-    }
-
-    into "$buildDir/resources/main/"
-}
-
-processResources {
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
-
-    finalizedBy replaceResources
-}
-
-jar {
-    manifest {
-        attributes([
-                "Specification-Title": archivesBaseName,
-                "Specification-Vendor": "Hantonik",
-                "Specification-Version": "1",
-                "Implementation-Title": project.name,
-                "Implementation-Version": version,
-                "Implementation-Vendor": "Hantonik",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-
-    finalizedBy('reobfJar')
-}
-
-task sourcesJar(type: Jar) {
-    classifier = "sources"
-    from sourceSets.main.allJava
-}
-
-artifacts {
-    archives jar
-    archives sourcesJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-            artifact sourcesJar
-
-            artifactId "$archivesBaseName"
-        }
-    }
-    repositories {
-        maven {
-            url "https://hantonikdev.jfrog.io/artifactory/mods/"
-
-            credentials {
-                username System.getenv("REPO_USER")
-                password System.getenv("REPO_PASSWORD")
-            }
-        }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+tasks.register('publishMod') {
+    dependsOn(':Forge:publishCurseForge').finalizedBy(':Fabric:publishCurseForge')
+    dependsOn(':Forge:modrinth').finalizedBy(':Fabric:modrinth')
 }
