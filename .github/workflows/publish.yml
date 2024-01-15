@@ -80,6 +80,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
+          name: changelog.md
           path: Changelog/changelog.md
 
   publish:
@@ -161,4 +162,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
+          name: changelog.md
           path: Changelog/changelog.md
