@@ -76,6 +76,12 @@ jobs:
           arguments: makeChangelog
           cache-read-only: false
 
+      - name: 'Upload changelog'
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          path: Changelog/changelog.md
+
   publish:
     name: 'Publish'
     runs-on: ubuntu-latest
@@ -94,6 +100,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: 'Download changelog'
+        uses: actions/download-artifact@v3
+        with:
+          name: changelog.md
+          path: Changelog
 
       - name: 'Publish with Gradle'
         uses: gradle/gradle-build-action@v2
@@ -121,7 +133,13 @@ jobs:
         id: latest-tag
         uses: WyriHaximus/github-action-get-previous-tag@v1
         with:
-          fallback: '1.0.0.0'
+          fallback: '0.0.0.0'
+
+      - name: 'Download changelog'
+        uses: actions/download-artifact@v3
+        with:
+          name: changelog.md
+          path: Changelog
 
       - name: 'Replace version in changelog'
         uses: jacobtomlinson/gha-find-replace@v3
@@ -138,3 +156,9 @@ jobs:
           target_commitish: ${{ github.ref }}
           body_path: Changelog/changelog.md
           files: artifacts/*
+
+      - name: 'Upload changelog'
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          path: Changelog/changelog.md
