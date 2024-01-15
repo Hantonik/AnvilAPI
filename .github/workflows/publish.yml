@@ -45,7 +45,7 @@ jobs:
           cp Forge/build/libs/*.jar artifacts
           cp NeoForge/build/libs/*.jar artifacts
 
-      - name: 'Upload artifact'
+      - name: 'Upload artifacts'
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
@@ -103,9 +103,9 @@ jobs:
           distribution: 'temurin'
 
       - name: 'Download changelog'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          pattern: Changelog
+          pattern: Changelog/*
           path: Changelog
           merge-multiple: true
 
@@ -138,9 +138,9 @@ jobs:
           fallback: '0.0.0.0'
 
       - name: 'Download changelog'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          pattern: Changelog
+          pattern: Changelog/*
           path: Changelog
           merge-multiple: true
 
