@@ -80,8 +80,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: changelog.md
-          path: Changelog/changelog.md
+          name: Changelog
+          path: Changelog/changelog.**
 
   publish:
     name: 'Publish'
@@ -105,8 +105,9 @@ jobs:
       - name: 'Download changelog'
         uses: actions/download-artifact@v3
         with:
-          name: changelog.md
+          pattern: Changelog/*
           path: Changelog
+          merge-multiple: true
 
       - name: 'Publish with Gradle'
         uses: gradle/gradle-build-action@v2
@@ -139,13 +140,14 @@ jobs:
       - name: 'Download changelog'
         uses: actions/download-artifact@v3
         with:
-          name: changelog.md
+          pattern: Changelog/*
           path: Changelog
+          merge-multiple: true
 
       - name: 'Replace version in changelog'
         uses: jacobtomlinson/gha-find-replace@v3
         with:
-          find: '${version}'
+          find: "${version}"
           replace: "`${{ steps.latest-tag.outputs.tag }}${{ inputs.suffix }}`"
           include: Changelog/changelog.md
 
@@ -162,5 +164,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: changelog.md
-          path: Changelog/changelog.md
+          name: Changelog
+          path: Changelog/changelog.**
