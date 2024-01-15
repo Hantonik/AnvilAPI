@@ -49,6 +49,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
+          name: 'Artifacts'
           path: artifacts/*
 
   changelog:
@@ -80,8 +81,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: Changelog
-          path: Changelog/changelog.**
+          name: 'Changelog'
+          path: Changelog/changelog.*
 
   publish:
     name: 'Publish'
@@ -103,7 +104,10 @@ jobs:
           distribution: 'temurin'
 
       - name: 'Download changelog'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
+        with:
+          name: 'Changelog'
+          path: Changelog/
 
       - name: 'Publish with Gradle'
         uses: gradle/gradle-build-action@v2
@@ -134,7 +138,10 @@ jobs:
           fallback: '0.0.0.0'
 
       - name: 'Download changelog'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
+        with:
+          name: 'Changelog'
+          path: Changelog/
 
       - name: 'Replace version in changelog'
         uses: jacobtomlinson/gha-find-replace@v3
