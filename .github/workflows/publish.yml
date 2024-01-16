@@ -162,8 +162,9 @@ jobs:
           tag_name: ${{ steps.latest-tag.outputs.tag }}
           target_commitish: ${{ github.ref }}
           body_path: Changelog/changelog.md
-          files: "**\/artifacts\/((?!sources).)*$"
-          fail_on_unmatched_files: true
+          files: |
+            artifacts/*
+            artifacts/!*sources*
 
       - name: 'Upload changelog'
         uses: actions/upload-artifact@v3
