@@ -158,7 +158,7 @@ jobs:
       - name: 'Create release'
         uses: softprops/action-gh-release@v1
         with:
-          name: "AnvilAPI-${{ github.ref_name }}-${{ steps.latest-tag.outputs.tag }}${{ inputs.suffix }}"
+          name: "${{ github.event.repository.name }}-${{ github.ref_name }}-${{ steps.latest-tag.outputs.tag }}${{ inputs.suffix }}"
           tag_name: ${{ steps.latest-tag.outputs.tag }}
           target_commitish: ${{ github.ref }}
           body_path: Changelog/changelog.md
