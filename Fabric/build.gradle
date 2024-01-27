@@ -4,7 +4,7 @@ import net.darkhax.curseforgegradle.Constants as CFConstants
 import net.darkhax.curseforgegradle.TaskPublishCurseForge
 
 plugins {
-	id 'fabric-loom' version '1.4.+'
+	id 'fabric-loom' version '1.5.+'
     id 'io.freefair.lombok' version '6.6.+'
 	
     id 'idea'
@@ -39,6 +39,10 @@ loom {
 			ideConfigGenerated(true)
 			runDir('run')
 		}
+	}
+
+	mixin {
+		useLegacyMixinAp = false
 	}
 
 	accessWidenerPath.set(file("src/main/resources/${mod_id}.accesswidener"))

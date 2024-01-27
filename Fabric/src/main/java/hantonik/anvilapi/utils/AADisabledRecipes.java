@@ -6,13 +6,14 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -28,9 +29,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStarted, ServerLifecycleEvents.EndDataPackReload {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AADisabledRecipes {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path PATH = FabricLoader.getInstance().getConfigDir().toAbsolutePath();
+    private static final Path PATH = Paths.get(FabricLoader.getInstance().getConfigDir().toAbsolutePath().toString(), AnvilAPI.MOD_ID);
 
     private static final List<Pair<Ingredient, Ingredient>> REPAIR = Lists.newArrayList();
     private static final List<Ingredient> REPAIR_ITEMS = Lists.newArrayList();
@@ -41,16 +43,6 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStar
     private static final List<Ingredient> REPAIR_ITEMS_INTERNAL = Lists.newArrayList();
     private static final List<Pair<Pair<Enchantment, Integer>, Ingredient>> ENCHANTMENTS_INTERNAL = Lists.newArrayList();
     private static final List<Pair<Pair<Enchantment, Integer>, Pair<Enchantment, Integer>>> ENCHANTMENT_COMBINING_INTERNAL = Lists.newArrayList();
-
-    public AADisabledRecipes() {
-        try {
-            Files.createDirectory(Paths.get(PATH.toString(), AnvilAPI.MOD_ID));
-        } catch (FileAlreadyExistsException e) {
-            AnvilAPI.LOGGER.debug("{} config directory already exists.", AnvilAPI.MOD_NAME);
-        } catch (IOException e) {
-            AnvilAPI.LOGGER.error("Failed to create {} config directory.", AnvilAPI.MOD_NAME);
-        }
-    }
 
     public static void disableRepairRecipe(Ingredient baseItem, Ingredient repairItem) {
         REPAIR_INTERNAL.add(Pair.of(baseItem, repairItem));
@@ -108,7 +100,15 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStar
         return stack.getItem().isValidRepairItem(stack, repairCandidate) || stack.isDamageableItem() && repairCandidate.isDamageableItem() && stack.is(repairCandidate.getItem());
     }
 
-    public void reload() {
+    private static void reload() {
+        try {
+            Files.createDirectory(PATH);
+        } catch (FileAlreadyExistsException e) {
+            AnvilAPI.LOGGER.debug("{} config directory already exists.", AnvilAPI.MOD_NAME);
+        } catch (IOException e) {
+            AnvilAPI.LOGGER.error("Failed to create {} config directory.", AnvilAPI.MOD_NAME);
+        }
+
         REPAIR.clear();
         REPAIR_ITEMS.clear();
         ENCHANTMENTS.clear();
@@ -119,10 +119,8 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStar
         ENCHANTMENTS.addAll(ENCHANTMENTS_INTERNAL);
         ENCHANTMENT_COMBINING.addAll(ENCHANTMENT_COMBINING_INTERNAL);
 
-        var dir = Paths.get(PATH.toString(), AnvilAPI.MOD_ID);
-
         try {
-            var file = new File(dir.toString(), "disabled_vanilla_recipes.json");
+            var file = new File(PATH.toString(), "disabled_vanilla_recipes.json");
 
             if (!file.exists()) {
                 file.createNewFile();
@@ -253,14 +251,8 @@ public final class AADisabledRecipes implements ServerLifecycleEvents.ServerStar
         }
     }
 
-    @Override
-    public void onServerStarted(MinecraftServer server) {
-        this.reload();
-    }
-
-    @Override
-    public void endDataPackReload(MinecraftServer server, CloseableResourceManager manager, boolean success) {
-        if (success)
-            this.reload();
+    public static void register() {
+        ServerWorldEvents.LOAD.register((server, level) -> AADisabledRecipes.reload());
+        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, manager) -> AADisabledRecipes.reload());
     }
 }
