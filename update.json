@@ -2,8 +2,8 @@
   "homepage": "https://www.curseforge.com/minecraft/mc-mods/anvilapi",
 
   "promos": {
-    "1.20.4-latest": "5.2.2.0",
-    "1.20.4-recommended": "5.2.2.0",
+    "1.20.4-latest": "5.2.2.1",
+    "1.20.4-recommended": "5.2.2.1",
 
     "1.20.2-latest": "5.1.1.0-beta",
 
@@ -22,6 +22,7 @@
   },
 
   "1.20.4": {
+    "5.2.2.1": "[Fabric] Fix client not receiving disabled recipes",
     "5.2.2.0": "Fix custom repair recipes not working. Fix class not found on server",
     "5.2.1.1-beta": "Fix tools cannot be repaired with tools",
     "5.2.1.0-beta": "Compatible with REI",

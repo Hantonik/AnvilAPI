@@ -8,11 +8,18 @@ import hantonik.anvilapi.AnvilAPI;
 import hantonik.anvilapi.init.AARecipeTypes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.SimpleContainer;
@@ -33,6 +40,7 @@ import java.util.List;
 public final class AADisabledRecipes {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path PATH = Paths.get(FabricLoader.getInstance().getConfigDir().toAbsolutePath().toString(), AnvilAPI.MOD_ID);
+    private static final ResourceLocation PACKET_ID = new ResourceLocation(AnvilAPI.MOD_ID, "disabled_recipes");
 
     private static final List<Pair<Ingredient, Ingredient>> REPAIR = Lists.newArrayList();
     private static final List<Ingredient> REPAIR_ITEMS = Lists.newArrayList();
@@ -251,8 +259,88 @@ public final class AADisabledRecipes {
         }
     }
 
+    private static FriendlyByteBuf serialize() {
+        var buffer = PacketByteBufs.create();
+
+        buffer.writeVarInt(REPAIR.size());
+
+        for (var entry : REPAIR) {
+            entry.getFirst().toNetwork(buffer);
+            entry.getSecond().toNetwork(buffer);
+        }
+
+        buffer.writeVarInt(REPAIR_ITEMS.size());
+
+        for (var entry : REPAIR_ITEMS)
+            entry.toNetwork(buffer);
+
+        buffer.writeVarInt(ENCHANTMENTS.size());
+
+        for (var entry : ENCHANTMENTS) {
+            var enchantment = entry.getFirst();
+
+            buffer.writeResourceLocation(BuiltInRegistries.ENCHANTMENT.getKey(enchantment.getFirst()));
+            buffer.writeVarInt(enchantment.getSecond());
+
+            entry.getSecond().toNetwork(buffer);
+        }
+
+        buffer.writeVarInt(ENCHANTMENT_COMBINING.size());
+
+        for (var entry : ENCHANTMENT_COMBINING) {
+            var first = entry.getFirst();
+
+            buffer.writeResourceLocation(BuiltInRegistries.ENCHANTMENT.getKey(first.getFirst()));
+            buffer.writeVarInt(first.getSecond());
+
+            var second = entry.getSecond();
+
+            if (second.getFirst() != null) {
+                buffer.writeBoolean(true);
+
+                buffer.writeResourceLocation(BuiltInRegistries.ENCHANTMENT.getKey(second.getFirst()));
+                buffer.writeVarInt(second.getSecond());
+            } else
+                buffer.writeBoolean(false);
+        }
+
+        return buffer;
+    }
+
+    private static void deserialize(FriendlyByteBuf buffer) {
+        var repairSize = buffer.readVarInt();
+
+        for (var i = 0; i < repairSize; i++)
+            REPAIR.add(Pair.of(Ingredient.fromNetwork(buffer), Ingredient.fromNetwork(buffer)));
+
+        var repairItemsSize = buffer.readVarInt();
+
+        for (var i = 0; i < repairItemsSize; i++)
+            REPAIR_ITEMS.add(Ingredient.fromNetwork(buffer));
+
+        var enchantmentsSize = buffer.readVarInt();
+
+        for (var i = 0; i < enchantmentsSize; i++)
+            ENCHANTMENTS.add(Pair.of(Pair.of(BuiltInRegistries.ENCHANTMENT.get(buffer.readResourceLocation()), buffer.readVarInt()), Ingredient.fromNetwork(buffer)));
+
+        var enchantmentCombiningSize = buffer.readVarInt();
+
+        for (var i = 0; i < enchantmentCombiningSize; i++)
+            ENCHANTMENT_COMBINING.add(Pair.of(Pair.of(BuiltInRegistries.ENCHANTMENT.get(buffer.readResourceLocation()), buffer.readVarInt()), buffer.readBoolean() ? Pair.of(BuiltInRegistries.ENCHANTMENT.get(buffer.readResourceLocation()), buffer.readVarInt()) : Pair.of(null, -1)));
+    }
+
     public static void register() {
         ServerWorldEvents.LOAD.register((server, level) -> AADisabledRecipes.reload());
-        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, manager) -> AADisabledRecipes.reload());
+        ServerLifecycleEvents.START_DATA_PACK_RELOAD.register((server, manager) -> {
+            AADisabledRecipes.reload();
+
+            server.getPlayerList().broadcastAll(ServerPlayNetworking.createS2CPacket(PACKET_ID, AADisabledRecipes.serialize()));
+        });
+        ServerPlayConnectionEvents.INIT.register(((handler, server) -> handler.send(ServerPlayNetworking.createS2CPacket(PACKET_ID, AADisabledRecipes.serialize()))));
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void registerClient() {
+        ClientPlayNetworking.registerGlobalReceiver(PACKET_ID, ((client, handler, buffer, sender) -> AADisabledRecipes.deserialize(buffer)));
     }
 }
