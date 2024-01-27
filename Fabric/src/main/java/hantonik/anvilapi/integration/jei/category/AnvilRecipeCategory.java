@@ -108,7 +108,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
 
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, IAnvilRecipe recipe, IFocusGroup focuses) {
-        builder.addSlot(recipe.isConsuming(0) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()).addTooltipCallback(((slotView, tooltip) -> {
+        builder.addSlot(RecipeIngredientRole.INPUT, 10, 40).addItemStacks(Arrays.stream(recipe.getInput(0).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(0), false)).peek(stack -> stack.setTag(recipe.getInputNbt(0))).toList()).addTooltipCallback(((slotView, tooltip) -> {
             tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(0) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
 
             if (recipe.isUsingDurability(0))
@@ -124,7 +124,7 @@ public final class AnvilRecipeCategory implements IRecipeCategory<IAnvilRecipe> 
             }
         }));
 
-        builder.addSlot(recipe.isConsuming(1) ? RecipeIngredientRole.INPUT : RecipeIngredientRole.CATALYST, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList()).addTooltipCallback(((slotView, tooltip) -> {
+        builder.addSlot(RecipeIngredientRole.INPUT, 59, 40).addItemStacks(Arrays.stream(recipe.getInput(1).getItems()).map(stack -> AAItemHelper.withSize(stack, recipe.getInputCount(1), false)).peek(stack -> stack.setTag(recipe.getInputNbt(1))).toList()).addTooltipCallback(((slotView, tooltip) -> {
             tooltip.add(Component.translatable("tooltip.anvilapi.consumes").append(": ").withStyle(ChatFormatting.GRAY).append(recipe.isConsuming(1) ? Component.literal("Yes").withStyle(ChatFormatting.RED) : Component.literal("No").withStyle(ChatFormatting.GREEN)));
 
             if (recipe.isUsingDurability(1))

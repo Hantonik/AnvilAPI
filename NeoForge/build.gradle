@@ -56,18 +56,18 @@ repositories {
 dependencies {
     implementation "net.neoforged:neoforge:$neo_version"
 
-    compileOnly "mezz.jei:jei-1.20.2-common-api:$jei_version" // Waiting for 1.20.4
-    compileOnly "mezz.jei:jei-1.20.2-forge-api:$jei_version" // Waiting for 1.20.4
-    compileOnly "mezz.jei:jei-1.20.2-forge:$jei_version" // Waiting for 1.20.4
+    compileOnly "mezz.jei:jei-$mc_version-common-api:$jei_version"
+    compileOnly "mezz.jei:jei-$mc_version-neoforge-api:$jei_version"
+    compileOnly "mezz.jei:jei-$mc_version-neoforge:$jei_version"
 
-    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-forge:$rei_version"
-    compileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:$rei_version"
-    implementation "me.shedaniel:RoughlyEnoughItems-forge:$rei_version"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge:$rei_version"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:$rei_version"
+    implementation "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
-    implementation "me.shedaniel.cloth:cloth-config-forge:$clothconfig_version"
-    implementation "dev.architectury:architectury-forge:$architectury_version"
+    implementation "me.shedaniel.cloth:cloth-config-neoforge:$clothconfig_version"
+    implementation "dev.architectury:architectury-neoforge:$architectury_version"
 
-    compileOnly "com.blamejared.crafttweaker:CraftTweaker-forge-1.20.2:$crafttweaker_version" // Waiting for 1.20.4
+    implementation "com.blamejared.crafttweaker:CraftTweaker-neoforge-$mc_version:$crafttweaker_version"
 
     compileOnly "org.projectlombok:lombok:$lombok_version"
     annotationProcessor "org.projectlombok:lombok:$lombok_version"
