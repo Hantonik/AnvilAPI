@@ -24,6 +24,13 @@ println "Using NeoForge: $neo_version, for Minecraft: $mc_version, with Mappings
 
 minecraft.accessTransformers.file('src/main/resources/META-INF/accesstransformer.cfg')
 
+subsystems {
+    parchment {
+        minecraftVersion = '1.20.3' // Waiting for 1.20.4
+        mappingsVersion = mappings_version
+    }
+}
+
 runs {
     configureEach {
         workingDirectory file('run')
@@ -95,7 +102,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 
     var modFile = upload('634377', tasks.jar.archiveFile)
     modFile.displayName = "${base.archivesName.get()}-$version"
-    modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
+    modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
     modFile.addGameVersion mc_version
     modFile.addModLoader('NeoForge')
     modFile.addJavaVersion 'Java 17'
@@ -112,7 +119,7 @@ modrinth {
 
     versionName = "${base.archivesName.get()}-$version"
     versionNumber = version
-    versionType = 'beta'
+    versionType = 'release'
 
     gameVersions = [ mc_version ]
     loaders = [ 'neoforge' ]

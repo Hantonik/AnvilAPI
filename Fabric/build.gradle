@@ -59,7 +59,7 @@ dependencies {
 
 	mappings loom.layered() {
 		officialMojangMappings()
-//		parchment("org.parchmentmc.data:parchment-$mc_version:$mappings_version@zip")
+		parchment("org.parchmentmc.data:parchment-1.20.3:$mappings_version@zip") // Waiting for 1.20.4
 	}
 
 	modImplementation "net.fabricmc:fabric-loader:$loader_version"
@@ -104,7 +104,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 
     var modFile = upload('634377', tasks.remapJar.archiveFile)
 	modFile.displayName = "${base.archivesName.get()}-$version"
-	modFile.releaseType = CFConstants.RELEASE_TYPE_BETA
+	modFile.releaseType = CFConstants.RELEASE_TYPE_RELEASE
 	modFile.addGameVersion mc_version
 	modFile.addModLoader 'Fabric'
 	modFile.addJavaVersion 'Java 17'
@@ -122,7 +122,7 @@ modrinth {
 
 	versionName = "${base.archivesName.get()}-$version"
 	versionNumber = version
-	versionType = 'beta'
+	versionType = 'release'
 
 	gameVersions = [ mc_version ]
 	loaders = [ 'fabric' ]
