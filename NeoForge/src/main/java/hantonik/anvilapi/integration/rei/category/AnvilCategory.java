@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.List;
@@ -60,6 +61,7 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
         widgets.add(Widgets.createDrawableWidget(((graphics, mouseX, mouseY, delta) -> {
             var font = Minecraft.getInstance().font;
             var player = Minecraft.getInstance().player;
+            var advancedTooltips = Minecraft.getInstance().options.advancedItemTooltips;
 
             graphics.blit(TEXTURE, startPoint.x, startPoint.y, 0, 0, 152, 79);
 
@@ -82,18 +84,20 @@ public final class AnvilCategory implements DisplayCategory<AnvilDisplay> {
                 if (!recipe.getReturn(0).isEmpty()) {
                     if (mouseX > startPoint.x + 9 && mouseX < startPoint.x + 27 && mouseY > startPoint.y + 39 && mouseY < startPoint.y + 57) {
                         var item = recipe.getReturn(0);
+                        var pixels = item.getTooltipLines(player, advancedTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL).size() * 10 + 10;
 
-                        graphics.renderItem(item, mouseX + 12, mouseY + 30);
-                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 30);
+                        graphics.renderItem(item, mouseX + 12, mouseY + pixels);
+                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + pixels);
                     }
                 }
 
                 if (!recipe.getReturn(1).isEmpty()) {
                     if (mouseX > startPoint.x + 58 && mouseX < startPoint.x + 76 && mouseY > startPoint.y + 39 && mouseY < startPoint.y + 57) {
                         var item = recipe.getReturn(1);
+                        var pixels = item.getTooltipLines(player, advancedTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL).size() * 10 + 10;
 
-                        graphics.renderItem(item, mouseX + 12, mouseY + 30);
-                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + 30);
+                        graphics.renderItem(item, mouseX + 12, mouseY + pixels);
+                        graphics.renderItemDecorations(font, item, mouseX + 12, mouseY + pixels);
                     }
                 }
 
